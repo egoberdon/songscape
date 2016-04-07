@@ -3,8 +3,6 @@ var container, scene, camera, renderer, controls, stats;
 var keyboard = new THREEx.KeyboardState();
 var clock = new THREE.Clock();
 // custom global variables
-var lamp;
-var shapes;
 var parameters;
 var gui;
 
@@ -42,91 +40,40 @@ function init()
 	stats.domElement.style.zIndex = 100;
 	container.appendChild( stats.domElement );
 
-	// LIGHT
-	var light = new THREE.PointLight(0xffffff);
-	light.position.set(-100,150,100);
-	scene.add(light);
+    // LIGHT
+  var light = new THREE.PointLight(0xffffff);
+  light.position.set(-100,150,100);
+  scene.add(light);
 
-	// need to add an ambient light
-	//  for ambient colors to be visible
-	// make the ambient light darker so that
-	//  it doesn't overwhelm (like emmisive light)
-	var light2 = new THREE.AmbientLight(0x333333);
-	light2.position.set( light.position );
-	scene.add(light2);
+    // Using phongMaterial
+  var shapeMaterial = new THREE.MeshPhongMaterial( { color:0xff0000, transparent:true, opacity:1 } );
 
-	// FLOOR
-	var floorTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );
-	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
-	floorTexture.repeat.set( 10, 10 );
-	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
-	var floorGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
-	var floor = new THREE.Mesh(floorGeometry, floorMaterial);
-	floor.position.y = -0.5;
-	floor.rotation.x = Math.PI / 2;
-	scene.add(floor);
+  //tetrahedron
+  var tetraGeometry = new THREE.TetrahedronGeometry( 40, 0);
+  tetra = new THREE.Mesh(tetraGeometry, shapeMaterial);
+  tetra.position.set(0,23,-200); //23 is half height based on tetrahedron geometry
+  scene.add(tetra);
 
-	////////////
-	// CUSTOM //
-	////////////
+    // create a small sphere to show position of light
+  var lamp = new THREE.Mesh(
+    new THREE.SphereGeometry( 10, 16, 8 ),
+    new THREE.MeshBasicMaterial( { color: 0xffaa00 } )
+  );
+  lamp.position = light.position;
+  scene.add( lamp );
 
-	// Using phongMaterial
-	var shapeMaterial = new THREE.MeshPhongMaterial( { color:0xff0000, transparent:true, opacity:1 } );
-
-	//tetrahedron
-	var tetraGeometry = new THREE.TetrahedronGeometry( 40, 0);
-	tetra = new THREE.Mesh(tetraGeometry, shapeMaterial);
-	tetra.position.set(0,23,-200); //23 is half height based on tetrahedron geometry
-	scene.add(tetra);
-
-	//dome
-	var domeGeometry = new THREE.SphereGeometry( 40, 32, 16, 0, 2 * Math.PI, 0, Math.PI / 2 )
-	dome = new THREE.Mesh(domeGeometry, shapeMaterial);
-	dome.position.set(0, 0, -100); //bottom of object is where it is set so height set to 0
-	scene.add( dome );
-
-	//torus - diamond
-	var diamondGeometry = new THREE.TorusGeometry( 25, 10, 8, 4 );
-	diamond = new THREE.Mesh(diamondGeometry, shapeMaterial);
-	diamond.position.set(0, 35, 0); //height is radius of torus plus diameter of tube
-	scene.add( diamond );
-
-	//var - cone
-	var coneGeometry = new THREE.CylinderGeometry( 10, 30, 100, 20, 4 );
-	cone = new THREE.Mesh(coneGeometry, shapeMaterial);
-	cone.position.set(0, 50, 100); // height is half height of cone
-	scene.add(cone);
-
-	//torus - bagel
-	var bagelGeometry = new THREE.TorusGeometry( 30, 20, 16, 40 );
-	bagel = new THREE.Mesh(bagelGeometry, shapeMaterial);
-	bagel.position.set(0, 50, 200); //height is radius of torus plus diameter of tube
-	scene.add( bagel );
-
-	// create a small sphere to show position of light
-	lamp = new THREE.Mesh(
-		new THREE.SphereGeometry( 10, 16, 8 ),
-		new THREE.MeshBasicMaterial( { color: 0xffaa00 } )
-	);
-	lamp.position = light.position;
-	scene.add( lamp );
 
 }
 
 function animate()
 {
-    requestAnimationFrame( animate );
+  requestAnimationFrame( animate );
 	render();
 	update();
 }
 
 function update()
 {
-	if ( keyboard.pressed("z") )
-	{
-		// do something
-	}
-
 	controls.update();
 	stats.update();
 }
