@@ -4,11 +4,12 @@ var src;
 var analyser = ctx.createAnalyser();
 var canvas = document.getElementById('canvas');
 var canvasCtx = canvas.getContext('2d');
+var mp3_location = 'mp3/sample.mp3';
 var WIDTH = 800;
 var HEIGHT = 200;
 function loadFile() {
     var req = new XMLHttpRequest();
-    req.open("GET","mp3/sample.mp3",true);
+    req.open("GET",mp3_location,true);
     req.responseType = "arraybuffer";
     req.onload = function() {
         //decode the loaded data
