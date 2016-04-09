@@ -18,7 +18,7 @@ function init()
 	var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
 	camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
 	scene.add(camera);
-	camera.position.set(0,150,400);
+	camera.position.set(10,150,400);
 	camera.lookAt(scene.position);
 	// RENDERER
 	if ( Detector.webgl )
@@ -42,7 +42,7 @@ function init()
 
     // LIGHT
   var light = new THREE.PointLight(0xffffff);
-  light.position.set(-100,150,100);
+  light.position.set(-100,0,100);
   scene.add(light);
 
     // Using phongMaterial
