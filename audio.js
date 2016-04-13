@@ -50,7 +50,7 @@ function draw(){
   drawVisual = requestAnimationFrame(draw); //keep looping the drawing function once it has been started
   analyser.getByteTimeDomainData(dataArray); //grab the time domain data and copy it into our array
   canvasCtx.fillStyle = 'rgb(255, 102, 255)';
-  canvasCtx.fillRect(0, 0, WIDTH, HEIGHT); //fill cavas w/ solid color
+  canvasCtx.fillRect(0, 0, WIDTH, HEIGHT); //fill canvas w/ solid color
   canvasCtx.lineWidth = 2; //line width of the wave
   canvasCtx.strokeStyle = 'rgb(0, 0, 0)'; //color of the wave
   canvasCtx.beginPath(); //begin drawing the path
