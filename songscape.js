@@ -5,7 +5,8 @@ var clock = new THREE.Clock();
 // custom global variables
 var parameters;
 var gui;
-
+var loader = new THREE.JSONLoader(); // init the loader util
+var face;
 init();
 animate();
 
@@ -47,24 +48,22 @@ function init()
 
     // Using phongMaterial
   var shapeMaterial = new THREE.MeshPhongMaterial( { color:0xff0000, transparent:true, opacity:1 } );
-
-  //tetrahedron
-  var tetraGeometry = new THREE.TetrahedronGeometry( 40, 0);
-  tetra = new THREE.Mesh(tetraGeometry, shapeMaterial);
-  tetra.position.set(0,23,-200); //23 is half height based on tetrahedron geometry
-  scene.add(tetra);
-
+	
     // create a small sphere to show position of light
   var lamp = new THREE.Mesh(
     new THREE.SphereGeometry( 10, 16, 8 ),
     new THREE.MeshBasicMaterial( { color: 0xffaa00 } )
   );
   lamp.position = light.position;
-  scene.add( lamp );
+  scene.add(lamp);
 
+	loader.load('obj/face.json', function (geometry) {
+		face = new THREE.Mesh(geometry,shapeMaterial); // create a mesh with models geometry and material
+		face.position.set(10,150,-100);
+		scene.add(face);
+	});
 
 }
-
 function animate()
 {
   requestAnimationFrame( animate );
