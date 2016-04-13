@@ -7,6 +7,7 @@ var parameters;
 var gui;
 var loader = new THREE.JSONLoader(); // init the loader util
 var face;
+var faces = []; //array to store all active face objects
 init();
 animate();
 
@@ -41,6 +42,17 @@ function init()
 	stats.domElement.style.zIndex = 100;
 	container.appendChild( stats.domElement );
 
+	// FLOOR
+	var floorTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );
+	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
+	floorTexture.repeat.set( 10, 10 );
+	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
+	var floorGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
+	var floor = new THREE.Mesh(floorGeometry, floorMaterial);
+	floor.position.y = -0.5;
+	floor.rotation.x = Math.PI / 2;
+	scene.add(floor);
+
     // LIGHT
   var light = new THREE.PointLight(0xffffff);
   light.position.set(-100,0,100);
@@ -48,7 +60,7 @@ function init()
 
     // Using phongMaterial
   var shapeMaterial = new THREE.MeshPhongMaterial( { color:0xff0000, transparent:true, opacity:1 } );
-	
+
     // create a small sphere to show position of light
   var lamp = new THREE.Mesh(
     new THREE.SphereGeometry( 10, 16, 8 ),
