@@ -51,6 +51,27 @@ function init()
 	floor.position.y = -0.5;
 	floor.rotation.x = Math.PI / 2;
 	scene.add(floor);
+	
+	// ROWS OF SPHERES
+	var sphereGeom =  new THREE.SphereGeometry( 30, 32, 16 );
+	var hex = 0xffff00;
+	var darkMaterialP = new THREE.MeshPhongMaterial( { color: hex } );
+	var sphereLeft;	
+	var sphereRight;
+	var zSpherePosition = 200; // starting z-coordinate for spheres
+	for (var i = 0; i < 5; i++) {
+		// left row
+		sphereLeft = new THREE.Mesh( sphereGeom.clone(), darkMaterialP );
+		sphereLeft.position.set(-100, 50, zSpherePosition);
+		scene.add( sphereLeft );
+
+		// right row
+		sphereRight = new THREE.Mesh( sphereGeom.clone(), darkMaterialP );
+		sphereRight.position.set(100, 50, zSpherePosition);
+		scene.add( sphereRight );
+
+		zSpherePosition -= 150; // go deeper
+	}
 
     // LIGHT
   var light = new THREE.PointLight(0xffffff);
