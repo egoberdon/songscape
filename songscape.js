@@ -6,7 +6,6 @@ var clock = new THREE.Clock();
 var parameters;
 var gui;
 var loader = new THREE.JSONLoader(); // init the loader util
-var face;
 var faces = []; //array to store all active face objects
 init();
 animate();
@@ -55,7 +54,7 @@ function init()
 
     // LIGHT
   var light = new THREE.PointLight(0xffffff);
-  light.position.set(-100,0,100);
+  light.position.set(-100,100,100);
   scene.add(light);
 
     // Using phongMaterial
@@ -70,11 +69,11 @@ function init()
   scene.add(lamp);
 
 	loader.load('obj/face.json', function (geometry) {
-		face = new THREE.Mesh(geometry,shapeMaterial); // create a mesh with models geometry and material
-		face.position.set(10,150,-100);
-		scene.add(face);
+		var face = new THREE.Mesh(geometry,shapeMaterial); // create a mesh with models geometry and material
 	});
-
+	faces[0].position.set(0,100,100);
+	faces[0].scale.set(30,30,30);
+	scene.add(faces[0]);
 }
 function animate()
 {
