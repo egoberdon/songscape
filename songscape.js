@@ -51,12 +51,12 @@ function init()
 	floor.position.y = -0.5;
 	floor.rotation.x = Math.PI / 2;
 	scene.add(floor);
-	
+
 	// ROWS OF SPHERES
 	var sphereGeom =  new THREE.SphereGeometry( 30, 32, 16 );
 	var hex = 0xffff00;
 	var darkMaterialP = new THREE.MeshPhongMaterial( { color: hex } );
-	var sphereLeft;	
+	var sphereLeft;
 	var sphereRight;
 	var zSpherePosition = 200; // starting z-coordinate for spheres
 	for (var i = 0; i < 5; i++) {
@@ -91,10 +91,10 @@ function init()
 
 	loader.load('obj/face.json', function (geometry) {
 		var face = new THREE.Mesh(geometry,shapeMaterial); // create a mesh with models geometry and material
+		face.position.set(0,100,100);
+		face.scale.set(3,3,3);
+		scene.add(face);
 	});
-	faces[0].position.set(0,100,100);
-	faces[0].scale.set(30,30,30);
-	scene.add(faces[0]);
 }
 function animate()
 {
