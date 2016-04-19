@@ -38,7 +38,6 @@ function init()
 	THREEx.FullScreen.bindKey({ charCode : 'm'.charCodeAt(0) });
 	// CONTROLS
 	controls = new THREE.OrbitControls( camera, renderer.domElement );
-	//controls = new THREE.TrackballControls(camera);
 	// STATS
 	stats = new Stats();
 	stats.domElement.style.position = 'absolute';
@@ -99,12 +98,12 @@ function init()
   lamp.position = light.position;
   scene.add(lamp);
 
-	// loader.load('obj/face.json', function (geometry) {
-	// 	var face = new THREE.Mesh(geometry,shapeMaterial); // create a mesh with models geometry and material
-	// });
-	//faces[0].position.set(0,100,100);
-	//faces[0].scale.set(30,30,30);
-	//scene.add(faces[0]);
+  loader.load('obj/face.json', function (geometry) {
+    var face = new THREE.Mesh(geometry,shapeMaterial); // create a mesh with models geometry and material
+  });
+  faces[0].position.set(0,100,100);
+  faces[0].scale.set(30,30,30);
+  scene.add(faces[0]);
 }
 function animate()
 {
@@ -118,21 +117,11 @@ function update()
 	controls.update();
 	stats.update();
 
-	if ( keyboard.pressed("A") )
-		cameraZPosition = cameraZPosition - 5;
-
-	if ( keyboard.pressed("D") )
-		cameraZPosition = cameraZPosition + 5;
-
-	if (cameraZPosition == -380)
-		cameraZPosition = 380;
-
+	if ( keyboard.pressed("A") ) cameraZPosition = cameraZPosition - 5;
+	if ( keyboard.pressed("D") ) cameraZPosition = cameraZPosition + 5;
+	if (cameraZPosition == -380) cameraZPosition = 380;
 	camera.position.set(10,30,cameraZPosition);
-
 	camera.lookAt(new THREE.Vector3(0,150,-4000));
-
-
-
 }
 
 function render()
