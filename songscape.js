@@ -7,6 +7,9 @@ var parameters;
 var gui;
 var loader = new THREE.JSONLoader(); // init the loader util
 var faces = []; //array to store all active face objects
+var cube;
+var cameraZPosition = 400;
+
 init();
 animate();
 
@@ -19,8 +22,9 @@ function init()
 	var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
 	camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
 	scene.add(camera);
-	camera.position.set(10,150,400);
+	camera.position.set(10,150,cameraZPosition);
 	camera.lookAt(scene.position);
+
 	// RENDERER
 	if ( Detector.webgl )
 		renderer = new THREE.WebGLRenderer( {antialias:true} );
@@ -34,6 +38,7 @@ function init()
 	THREEx.FullScreen.bindKey({ charCode : 'm'.charCodeAt(0) });
 	// CONTROLS
 	controls = new THREE.OrbitControls( camera, renderer.domElement );
+	//controls = new THREE.TrackballControls(camera);
 	// STATS
 	stats = new Stats();
 	stats.domElement.style.position = 'absolute';
@@ -73,6 +78,11 @@ function init()
 		zSpherePosition -= 150; // go deeper
 	}
 
+	var cubeGeom = new THREE.CubeGeometry(30,30,30);
+	cube = new THREE.Mesh( cubeGeom.clone(), darkMaterialP);
+	cube.position.set(0,50,50);
+	scene.add(cube);
+
     // LIGHT
   var light = new THREE.PointLight(0xffffff);
   light.position.set(-100,100,100);
@@ -89,12 +99,12 @@ function init()
   lamp.position = light.position;
   scene.add(lamp);
 
-	loader.load('obj/face.json', function (geometry) {
-		var face = new THREE.Mesh(geometry,shapeMaterial); // create a mesh with models geometry and material
-	});
-	faces[0].position.set(0,100,100);
-	faces[0].scale.set(30,30,30);
-	scene.add(faces[0]);
+	// loader.load('obj/face.json', function (geometry) {
+	// 	var face = new THREE.Mesh(geometry,shapeMaterial); // create a mesh with models geometry and material
+	// });
+	//faces[0].position.set(0,100,100);
+	//faces[0].scale.set(30,30,30);
+	//scene.add(faces[0]);
 }
 function animate()
 {
@@ -107,9 +117,25 @@ function update()
 {
 	controls.update();
 	stats.update();
+
+	if ( keyboard.pressed("A") )
+		cameraZPosition = cameraZPosition - 5;
+
+	if ( keyboard.pressed("D") )
+		cameraZPosition = cameraZPosition + 5;
+
+	if (cameraZPosition == -380)
+		cameraZPosition = 380;
+
+	camera.position.set(10,30,cameraZPosition);
+
+	camera.lookAt(new THREE.Vector3(0,150,-4000));
+
+
+
 }
 
 function render()
-{
+{		
 	renderer.render( scene, camera );
 }
