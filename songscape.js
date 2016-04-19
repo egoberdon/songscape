@@ -6,7 +6,6 @@ var clock = new THREE.Clock();
 var parameters;
 var gui;
 var loader = new THREE.JSONLoader(); // init the loader util
-var faces = []; //array to store all active face objects
 init();
 animate();
 
@@ -77,15 +76,13 @@ function init()
 			faceLeft = new THREE.Mesh(geometry,leftShapeMaterial);
 			faceLeft.position.set(-100, 50, zFacePosition);
 			faceLeft.scale.set(3,3,3);
-			scene.add( faceLeft );
-			faces.push(faceLeft);
+			scene.add(faceLeft);
 			// right row
 			faceRight = new THREE.Mesh(geometry,rightShapeMaterial);
 			faceRight.position.set(100, 50, zFacePosition);
 			faceRight.scale.set(3,3,3);
 			faceRight.rotateY(180);
-			scene.add( faceRight );
-			faces.push(faceRight);
+			scene.add(faceRight);
 			zFacePosition -= 150; // go deeper
 		}
 	});
