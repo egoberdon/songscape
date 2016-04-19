@@ -52,34 +52,10 @@ function init()
 	floor.rotation.x = Math.PI / 2;
 	scene.add(floor);
 
-	// ROWS OF SPHERES
-	var sphereGeom =  new THREE.SphereGeometry( 30, 32, 16 );
-	var hex = 0xffff00;
-	var darkMaterialP = new THREE.MeshPhongMaterial( { color: hex } );
-	var sphereLeft;
-	var sphereRight;
-	var zSpherePosition = 200; // starting z-coordinate for spheres
-	for (var i = 0; i < 5; i++) {
-		// left row
-		sphereLeft = new THREE.Mesh( sphereGeom.clone(), darkMaterialP );
-		sphereLeft.position.set(-100, 50, zSpherePosition);
-		scene.add( sphereLeft );
-
-		// right row
-		sphereRight = new THREE.Mesh( sphereGeom.clone(), darkMaterialP );
-		sphereRight.position.set(100, 50, zSpherePosition);
-		scene.add( sphereRight );
-
-		zSpherePosition -= 150; // go deeper
-	}
-
     // LIGHT
   var light = new THREE.PointLight(0xffffff);
   light.position.set(-100,100,100);
   scene.add(light);
-
-    // Using phongMaterial
-  var shapeMaterial = new THREE.MeshPhongMaterial( { color:0xff0000, transparent:true, opacity:1 } );
 
     // create a small sphere to show position of light
   var lamp = new THREE.Mesh(
@@ -89,11 +65,29 @@ function init()
   lamp.position = light.position;
   scene.add(lamp);
 
-	loader.load('obj/face.json', function (geometry) {
-		var face = new THREE.Mesh(geometry,shapeMaterial); // create a mesh with models geometry and material
-		face.position.set(0,100,100);
-		face.scale.set(3,3,3);
-		scene.add(face);
+	loader.load('obj/finalFace.json', function (geometry) {
+		// ROWS OF FACES
+		var faceLeft;
+		var faceRight;
+		var leftShapeMaterial = new THREE.MeshPhongMaterial( { color:0xff0000, transparent:true, opacity:1 } );
+		var rightShapeMaterial = new THREE.MeshPhongMaterial( { color:0xfff000, transparent:true, opacity:1 } );
+		var zFacePosition = 200; // starting z-coordinate for spheres
+		for (var i = 0; i < 4; i++) {
+			// left row
+			faceLeft = new THREE.Mesh(geometry,leftShapeMaterial);
+			faceLeft.position.set(-100, 50, zFacePosition);
+			faceLeft.scale.set(3,3,3);
+			scene.add( faceLeft );
+			faces.push(faceLeft);
+			// right row
+			faceRight = new THREE.Mesh(geometry,rightShapeMaterial);
+			faceRight.position.set(100, 50, zFacePosition);
+			faceRight.scale.set(3,3,3);
+			faceRight.rotateY(180);
+			scene.add( faceRight );
+			faces.push(faceRight);
+			zFacePosition -= 150; // go deeper
+		}
 	});
 }
 function animate()
