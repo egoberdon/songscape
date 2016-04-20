@@ -21,6 +21,9 @@ var materialFront, materialSide, materialArray;
 var textMesh, textGeom, textParams, textMaterial, textWidth;
 var score = 0;
 
+var targetList = [];
+var projector, mouse = { x: 0, y: 0 };
+
 init();
 animate();
 
@@ -100,12 +103,14 @@ function init()
 			faceLeft.position.set(-100, 50, zFacePosition);
 			faceLeft.scale.set(3,3,3);
 			scene.add(faceLeft);
+			targetList.push(faceLeft); //update score when face is clicked
 			// right row
 			faceRight = new THREE.Mesh(geometry,rightShapeMaterial);
 			faceRight.position.set(100, 50, zFacePosition);
 			faceRight.scale.set(3,3,3);
 			faceRight.rotateY(180);
 			scene.add(faceRight);
+			targetList.push(faceRight); //update score when face is clicked
 			zFacePosition -= 150; // go deeper
 		}
 	});
@@ -127,6 +132,12 @@ function init()
 	scene.add( skyBox );
 	
 	createScoreText();
+	
+	// when the mouse moves, call the given function
+	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+
+	// initialize object to perform world/screen calculations
+	projector = new THREE.Projector();
 	
 }
 
@@ -157,6 +168,42 @@ function createScoreText() {
 function refreshText() {
 	scene.remove(textMesh);
 	createScoreText();
+}
+
+function onDocumentMouseDown( event ) 
+{
+	// the following line would stop any other event handler from firing
+	// (such as the mouse's TrackballControls)
+	// event.preventDefault();
+	
+	console.log("Click.");
+	
+	// update the mouse variable
+	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+	
+	// find intersections
+
+	// create a Ray with origin at the mouse position
+	//   and direction into the scene (camera direction)
+	var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
+	projector.unprojectVector( vector, camera );
+	var ray = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+
+	// create an array containing all objects in the scene with which the ray intersects
+	var intersects = ray.intersectObjects( targetList );
+	
+	// if there is one (or more) intersections
+	if ( intersects.length > 0 )
+	{
+		score++;
+		refreshText();
+
+		// change the color of the closest face.
+		// intersects[ 0 ].face.color.setRGB( 0.8 * Math.random() + 0.2, 0, 0 ); 
+		// intersects[ 0 ].object.geometry.colorsNeedUpdate = true;
+	}
+
 }
 
 function animate()
