@@ -2,13 +2,20 @@
 var container, scene, camera, renderer, controls, stats;
 var keyboard = new THREEx.KeyboardState();
 var clock = new THREE.Clock();
-// custom global variables
+
+// controls
 var parameters;
 var gui;
+
+//face models
 var loader = new THREE.JSONLoader(); // init the loader util
 var face = eli = 'obj/finalFace.json'; //normal eli face
 var steve = 'obj/steve.json'; //alternate face for steve mode
 var steve_mode = false; //steve mode boolean flag
+
+//lighting
+var sun, sun_y;
+var light;
 
 init();
 animate();
@@ -55,18 +62,24 @@ function init()
 	floor.rotation.x = Math.PI / 2;
 	scene.add(floor);
 
-    // LIGHT
-  var light = new THREE.PointLight(0xffffff);
-  light.position.set(-100,100,100);
-  scene.add(light);
+	light = new THREE.DirectionalLight(0xffffff);
+	light.intensity = 3;
 
-    // create a small sphere to show position of light
-  var lamp = new THREE.Mesh(
+	var back_light = new THREE.DirectionalLight(0xffffff); //add a little light behind camera to fake ambient effect
+	back_light.intensity = .25;
+	back_light.position.set(200,100,500);
+	scene.add(back_light);
+
+  sun = new THREE.Mesh(
     new THREE.SphereGeometry( 10, 16, 8 ),
     new THREE.MeshBasicMaterial( { color: 0xffaa00 } )
   );
-  lamp.position = light.position;
-  scene.add(lamp);
+	sun_y = 100;
+  sun.position.set(-200,sun_y, -500);
+  scene.add(sun);
+	light.position = sun.position; //these are the same
+	scene.add(light);
+
 	if (steve_mode){
 		face = steve;
 	}
@@ -74,8 +87,8 @@ function init()
 		// ROWS OF FACES
 		var faceLeft;
 		var faceRight;
-		var leftShapeMaterial = new THREE.MeshPhongMaterial( { color:0xff0000, transparent:true, opacity:1 } );
-		var rightShapeMaterial = new THREE.MeshPhongMaterial( { color:0xfff000, transparent:true, opacity:1 } );
+		var leftShapeMaterial = new THREE.MeshPhongMaterial( { color:0xff0000, transparent:true, opacity:1, ambient:0xff0000 } );
+		var rightShapeMaterial = new THREE.MeshPhongMaterial( { color:0xfff000, transparent:true, opacity:1, ambient:0xfff000 } );
 		var zFacePosition = 200; // starting z-coordinate for spheres
 		for (var i = 0; i < 4; i++) {
 			// left row
@@ -118,7 +131,31 @@ function animate()
 }
 
 function update()
+//TODO: if sun moves underground or above 1000 it no longer shines
 {
+	if ( keyboard.pressed("up") ) //sun rises, light decreases, max 1,000
+	{
+		sun_y +=5;
+		if (sun_y > 1000){
+			sun_y = 1000;
+			light.intensity = 0;
+		}
+		else{
+			light.intensity = 3;
+			sun.position.setY(sun_y);
+		}
+	}
+	if (keyboard.pressed("down")){ //sun lowers, light increases, max increases
+		sun_y -=5;
+		if (sun_y < -10){
+			sun_y = -10;
+			light.intensity = 0;
+		}
+		else{
+			light.intensity = 3;
+			sun.position.setY(sun_y);
+		}
+	}
 	controls.update();
 	stats.update();
 }
