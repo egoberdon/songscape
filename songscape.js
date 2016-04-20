@@ -122,6 +122,28 @@ function init()
 	var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
 	scene.add( skyBox );
 	
+	// add 3D text
+	var materialFront = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+	var materialSide = new THREE.MeshBasicMaterial( { color: 0x000088 } );
+	var materialArray = [ materialFront, materialSide ];
+	var textGeom = new THREE.TextGeometry( "Score: ", 
+	{
+		size: 30, height: 4, curveSegments: 3,
+		font: "helvetiker", weight: "bold", style: "normal",
+		bevelThickness: 1, bevelSize: 2, bevelEnabled: true,
+		material: 0, extrudeMaterial: 1
+	});
+	
+	var textMaterial = new THREE.MeshFaceMaterial(materialArray);
+	var textMesh = new THREE.Mesh(textGeom, textMaterial );
+	
+	textGeom.computeBoundingBox();
+	var textWidth = textGeom.boundingBox.max.x - textGeom.boundingBox.min.x;
+	
+	textMesh.position.set(-450, 125, -200);
+	textMesh.rotation.x = -Math.PI / 4;
+	scene.add(textMesh);
+	
 }
 function animate()
 {
