@@ -6,6 +6,10 @@ var clock = new THREE.Clock();
 var parameters;
 var gui;
 var loader = new THREE.JSONLoader(); // init the loader util
+var face = eli = 'obj/finalFace.json'; //normal eli face
+var steve = 'obj/steve.json'; //alternate face for steve mode
+var steve_mode = false; //steve mode boolean flag
+
 init();
 animate();
 
@@ -63,8 +67,10 @@ function init()
   );
   lamp.position = light.position;
   scene.add(lamp);
-
-	loader.load('obj/finalFace.json', function (geometry) {
+	if (steve_mode){
+		face = steve;
+	}
+	loader.load(face, function (geometry) {
 		// ROWS OF FACES
 		var faceLeft;
 		var faceRight;
