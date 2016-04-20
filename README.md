@@ -1,5 +1,11 @@
 # songscape.js
 
+##songscape.js
+
+songscape.js is the main part of the program
+the current songscape.js is a row of faces(red and yellow) arrow keys up and down move a sun (and directional light) to change the mood of the scene
+
+
 ##audio.js
 
 audio js is the current wave form visualizer, to use download 'audio.html' and 'audio.js'
