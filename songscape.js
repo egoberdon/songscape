@@ -17,6 +17,10 @@ var steve_mode = false; //steve mode boolean flag
 var sun, sun_y;
 var light;
 
+var materialFront, materialSide, materialArray;
+var textMesh, textGeom, textParams, textMaterial, textWidth;
+var score = 0;
+
 init();
 animate();
 
@@ -122,29 +126,39 @@ function init()
 	var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
 	scene.add( skyBox );
 	
+	createScoreText();
+	
+}
+
+function createScoreText() {
 	// add 3D text
-	var materialFront = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
-	var materialSide = new THREE.MeshBasicMaterial( { color: 0x000088 } );
-	var materialArray = [ materialFront, materialSide ];
-	var textGeom = new THREE.TextGeometry( "Score: ", 
-	{
+	materialFront = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+	materialSide = new THREE.MeshBasicMaterial( { color: 0x000088 } );
+	materialArray = [ materialFront, materialSide ];
+	textParams = {
 		size: 30, height: 4, curveSegments: 3,
 		font: "helvetiker", weight: "bold", style: "normal",
 		bevelThickness: 1, bevelSize: 2, bevelEnabled: true,
 		material: 0, extrudeMaterial: 1
-	});
+	};
+	textGeom = new THREE.TextGeometry( "Score: " + score, textParams);
 	
-	var textMaterial = new THREE.MeshFaceMaterial(materialArray);
-	var textMesh = new THREE.Mesh(textGeom, textMaterial );
+	textMaterial = new THREE.MeshFaceMaterial(materialArray);
+	textMesh = new THREE.Mesh(textGeom, textMaterial );
 	
 	textGeom.computeBoundingBox();
-	var textWidth = textGeom.boundingBox.max.x - textGeom.boundingBox.min.x;
+	textWidth = textGeom.boundingBox.max.x - textGeom.boundingBox.min.x;
 	
 	textMesh.position.set(-450, 125, -200);
 	textMesh.rotation.x = -Math.PI / 4;
 	scene.add(textMesh);
-	
 }
+
+function refreshText() {
+	scene.remove(textMesh);
+	createScoreText();
+}
+
 function animate()
 {
   requestAnimationFrame( animate );
@@ -177,6 +191,11 @@ function update()
 			light.intensity = 3;
 			sun.position.setY(sun_y);
 		}
+	}
+	if ( keyboard.pressed("p") )
+	{
+		score++;
+		refreshText();
 	}
 	controls.update();
 	stats.update();
