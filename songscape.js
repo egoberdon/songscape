@@ -59,7 +59,7 @@ function init()
 	container.appendChild( stats.domElement );
 
 	// FLOOR
-	var floorTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );
+	var floorTexture = new THREE.ImageUtils.loadTexture( 'images/mars.jpg' );
 	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
 	floorTexture.repeat.set( 10, 10 );
 	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
@@ -114,12 +114,12 @@ function init()
 			zFacePosition -= 150; // go deeper
 		}
 	});
-	
-	//CODE FROM Stemkoski Skybox.html; TO-DO: customize with own sky images/textures
+
+	//CODE FROM Stemkoski Skybox.html; TODO: customize with own sky images/textures
 	var imagePrefix = "images/space-";
 	var directions  = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
 		var imageSuffix = ".jpg";
-		var skyGeometry = new THREE.CubeGeometry( 5000, 5000, 5000 );	
+		var skyGeometry = new THREE.CubeGeometry( 5000, 5000, 5000 );
 
 			var materialArray = [];
 	for (var i = 0; i < 6; i++)
@@ -130,15 +130,15 @@ function init()
 	var skyMaterial = new THREE.MeshFaceMaterial( materialArray );
 	var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
 	scene.add( skyBox );
-	
+
 	createScoreText();
-	
+
 	// when the mouse moves, call the given function
 	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 
 	// initialize object to perform world/screen calculations
 	projector = new THREE.Projector();
-	
+
 }
 
 function createScoreText() {
@@ -153,13 +153,13 @@ function createScoreText() {
 		material: 0, extrudeMaterial: 1
 	};
 	textGeom = new THREE.TextGeometry( "Score: " + score, textParams);
-	
+
 	textMaterial = new THREE.MeshFaceMaterial(materialArray);
 	textMesh = new THREE.Mesh(textGeom, textMaterial );
-	
+
 	textGeom.computeBoundingBox();
 	textWidth = textGeom.boundingBox.max.x - textGeom.boundingBox.min.x;
-	
+
 	textMesh.position.set(-450, 125, -200);
 	textMesh.rotation.x = -Math.PI / 4;
 	scene.add(textMesh);
@@ -170,18 +170,18 @@ function refreshText() {
 	createScoreText();
 }
 
-function onDocumentMouseDown( event ) 
+function onDocumentMouseDown( event )
 {
 	// the following line would stop any other event handler from firing
 	// (such as the mouse's TrackballControls)
 	// event.preventDefault();
-	
+
 	console.log("Click.");
-	
+
 	// update the mouse variable
 	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-	
+
 	// find intersections
 
 	// create a Ray with origin at the mouse position
@@ -192,7 +192,7 @@ function onDocumentMouseDown( event )
 
 	// create an array containing all objects in the scene with which the ray intersects
 	var intersects = ray.intersectObjects( targetList );
-	
+
 	// if there is one (or more) intersections
 	if ( intersects.length > 0 )
 	{
@@ -200,7 +200,7 @@ function onDocumentMouseDown( event )
 		refreshText();
 
 		// change the color of the closest face.
-		// intersects[ 0 ].face.color.setRGB( 0.8 * Math.random() + 0.2, 0, 0 ); 
+		// intersects[ 0 ].face.color.setRGB( 0.8 * Math.random() + 0.2, 0, 0 );
 		// intersects[ 0 ].object.geometry.colorsNeedUpdate = true;
 	}
 
