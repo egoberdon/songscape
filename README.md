@@ -1,5 +1,7 @@
 # songscape.js
 
+Built by dreamers for dreamers
+
 ##songscape.js
 
 songscape.js is the main part of the program
