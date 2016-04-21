@@ -58,17 +58,6 @@ function init()
 	stats.domElement.style.zIndex = 100;
 	container.appendChild( stats.domElement );
 
-	// FLOOR
-	var floorTexture = new THREE.ImageUtils.loadTexture( 'images/mars.jpg' );
-	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
-	floorTexture.repeat.set( 10, 10 );
-	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
-	var floorGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
-	var floor = new THREE.Mesh(floorGeometry, floorMaterial);
-	floor.position.y = -0.5;
-	floor.rotation.x = Math.PI / 2;
-	scene.add(floor);
-
 	light = new THREE.DirectionalLight(0xffffff);
 	light.intensity = 3;
 
@@ -133,12 +122,26 @@ function init()
 
 	createScoreText();
 
+	createFloor();
+
 	// when the mouse moves, call the given function
 	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 
 	// initialize object to perform world/screen calculations
 	projector = new THREE.Projector();
 
+}
+
+function createFloor(){
+	var floorTexture = new THREE.ImageUtils.loadTexture( 'images/mars.jpg' );
+	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
+	floorTexture.repeat.set( 10, 10 );
+	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
+	var floorGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
+	var floor = new THREE.Mesh(floorGeometry, floorMaterial);
+	floor.position.y = -0.5;
+	floor.rotation.x = Math.PI / 2;
+	scene.add(floor);
 }
 
 function createScoreText() {
@@ -214,7 +217,7 @@ function animate()
 }
 
 function update()
-//TODO: if sun moves underground or above 1000 it no longer shines
+//if sun moves underground or above 1000 it no longer shines
 {
 	if ( keyboard.pressed("up") ) //sun rises, light decreases, max 1,000
 	{
