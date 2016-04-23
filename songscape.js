@@ -1,5 +1,5 @@
 // standard global variables
-var container, scene, camera, renderer, controls, stats;
+var container, scene, camera, renderer, stats;
 var keyboard = new THREEx.KeyboardState();
 var clock = new THREE.Clock();
 
@@ -23,6 +23,10 @@ var score = 0;
 
 var targetList = [];
 var projector, mouse = { x: 0, y: 0 };
+var cameraZPosition = 400;
+var cameraYPosition = 150;
+
+
 
 init();
 animate();
@@ -36,8 +40,10 @@ function init()
 	var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
 	camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
 	scene.add(camera);
-	camera.position.set(10,150,400);
+	//camera.position.set(10,150,400);
+	camera.position.set(10,150,cameraZPosition);
 	camera.lookAt(scene.position);
+	//camera.lookAt(new THREE.Vector3(10,150,4000));
 	// RENDERER
 	if ( Detector.webgl )
 		renderer = new THREE.WebGLRenderer( {antialias:true} );
@@ -49,8 +55,6 @@ function init()
 	// EVENTS
 	THREEx.WindowResize(renderer, camera);
 	THREEx.FullScreen.bindKey({ charCode : 'm'.charCodeAt(0) });
-	// CONTROLS
-	controls = new THREE.OrbitControls( camera, renderer.domElement );
 	// STATS
 	stats = new Stats();
 	stats.domElement.style.position = 'absolute';
@@ -245,9 +249,22 @@ function update()
 	if ( keyboard.pressed("p") )
 	{
 		score++;
-		refreshText();
+		refreshText(); //add 1 to 3D Score Text
 	}
-	controls.update();
+	if ( keyboard.pressed("A") ) {
+		cameraZPosition = cameraZPosition - 5;
+	}
+
+
+	if ( keyboard.pressed("D") ) {
+		cameraZPosition = cameraZPosition + 5;
+	}
+
+	if (cameraZPosition == -380)
+		cameraZPosition = 380;
+
+	camera.position.set(10,150,cameraZPosition);
+
 	stats.update();
 }
 
