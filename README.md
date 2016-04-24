@@ -13,3 +13,9 @@ the current songscape.js is a row of faces(red and yellow) arrow keys up and dow
 audio js is the current wave form visualizer, to use download 'audio.html' and 'audio.js'
 Note: audio.js contains a hardcoded link to a local music file, make sure to change this location to a valid local path or url
 for it to work correctly
+
+##Current Controls
+
+'A' key -> move forward
+'D' key -> move backward
+Mouse Click on face -> 1 point
