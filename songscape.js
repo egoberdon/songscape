@@ -22,8 +22,7 @@ var textMesh, textGeom, textParams, textMaterial, textWidth;
 var score = 0;
 
 var targetList = [];
-var ground;
-var floor = []; //ground is loaded into floor array, for updating alonsgide camera
+var floor;
 var projector, mouse = { x: 0, y: 0 };
 var cameraZPosition = 400;
 var cameraYPosition = 150;
@@ -139,21 +138,20 @@ function init()
 }
 
 function createFloor(){
-    //every 100px on the z axis, add a bit of ground
+    //every 100px on the z axis, add a bit of floor
     //for ( var z= 100; z > -200; z-=100 ) {
-			var groundTexture = new THREE.ImageUtils.loadTexture( 'images/mars.jpg' );
-			var groundMaterial = new THREE.MeshBasicMaterial( { map: groundTexture, side: THREE.DoubleSide } );
-			var groundGeometry = new THREE.PlaneGeometry(1000, 1000);
-      ground = new THREE.Mesh(groundGeometry, groundMaterial);
+			var floorTexture = new THREE.ImageUtils.loadTexture( 'images/mars.jpg' );
+			var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
+			var floorGeometry = new THREE.PlaneGeometry(1000, 1000);
+      floor = new THREE.Mesh(floorGeometry, floorMaterial);
       //rotate 90 degrees around the xaxis so we can see the terrain
-      ground.rotation.x = -Math.PI/-2;
+      floor.rotation.x = -Math.PI/-2;
       // Then set the z position to where it is in the loop (distance of camera)
-      ground.position.z = cameraZPosition - 400;
-      ground.position.y -=0.5;
-      //add the ground to the scene
-      scene.add(ground);
+      floor.position.z = cameraZPosition - 400;
+      floor.position.y -=0.5;
+      //add the floor to the scene
+      scene.add(floor);
       //finally push it to the floor array
-      this.floor.push(ground);
     //}
 }
 
@@ -239,7 +237,7 @@ function movement(){
 	cameraZPosition = cameraZPosition - 5;
 	camera.position.set(10,150,cameraZPosition);
 	if (cameraZPosition % 200 == 0){
-		scene.remove(ground);
+		scene.remove(floor);
 		createFloor();
 	}
 }
@@ -255,7 +253,7 @@ function animate()
 }
 
 function update()
-//if sun moves underground or above 1000 it no longer shines
+//if sun moves underfloor or above 1000 it no longer shines
 {
 	if ( keyboard.pressed("up") ) //sun rises, light decreases, max 1,000
 	{
