@@ -123,13 +123,6 @@ function init()
 	var skyMaterial = new THREE.MeshFaceMaterial( materialArray );
 	var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
 	scene.add( skyBox );
-	
-	// var cube = new THREE.Mesh(
- //    new THREE.CubeGeometry( 20, 20, 20 ),
- //    new THREE.MeshBasicMaterial( { color: 0x0000ff } )
- //  );
-	// cube.position.set(10, 50, 0);
-	// scene.add( cube );
 
 	var cubeGeom = new THREE.CubeGeometry(30, 30, 30);
     var material = new THREE.MeshPhongMaterial({
@@ -140,7 +133,7 @@ function init()
         reflectivity: 5.5
         });
     cube = new THREE.Mesh(cubeGeom, material);
-    cube.position = new THREE.Vector3(10, 50, 0);
+    cube.position = new THREE.Vector3(10, 100, 0);
     scene.add(cube);
 
 	createScoreText();
@@ -286,8 +279,8 @@ function update()
 
 	if(typeof dataArray === 'object' && dataArray.length > 0) {
 		var k = 0;
-		var scale = dataArray[k] / 15;
-		cube.scale.z = (scale < 1 ? 1 : scale);
+		var scale = dataArray[k] / 45;
+		cube.scale.y = (scale < 1 ? 1 : scale);
 		k += (k < dataArray.length ? 1 : 0);
 	}
 
