@@ -138,36 +138,19 @@ function init()
 }
 
 function createFloor(){
-    //every 100px on the z axis, add a bit of floor
-    //for ( var z= 100; z > -200; z-=100 ) {
-			var floorTexture = new THREE.ImageUtils.loadTexture( 'images/mars.jpg' );
-			var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
-			var floorGeometry = new THREE.PlaneGeometry(1000, 1000);
-      floor = new THREE.Mesh(floorGeometry, floorMaterial);
-      //rotate 90 degrees around the xaxis so we can see the terrain
-      floor.rotation.x = -Math.PI/-2;
-      // Then set the z position to where it is in the loop (distance of camera)
-      floor.position.z = cameraZPosition - 400;
-      floor.position.y -=0.5;
-      //add the floor to the scene
-      scene.add(floor);
-      //finally push it to the floor array
-    //}
+		var floorTexture = new THREE.ImageUtils.loadTexture( 'images/mars.jpg' );
+		var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
+		var floorGeometry = new THREE.PlaneGeometry(1000, 1000);
+    floor = new THREE.Mesh(floorGeometry, floorMaterial);
+    //rotate 90 degrees around the xaxis so we can see the terrain
+    floor.rotation.x = -Math.PI/-2;
+    // Then set the z position to where it is in the loop (distance of camera)
+    floor.position.z = cameraZPosition - 400;
+    floor.position.y -=0.5;
+    //add the floor to the scene
+    scene.add(floor);
 }
 
-function moveWithCamera(){
-	 // loop through each of the 3 floors
-	 for(var i=0; i<this.floor.length; i++) {
-		 //if the camera has moved past the entire square, move the square
-		 if((this.floor[i].position.z - 100)>camera.position.z){
-			 	this.floor[i].position.z-=200;
-		 }
-		 //if the camera has moved past the entire square in the opposite direction, move the square the opposite way
-      else if((this.floor[i].position.z + this.tileHeight)<camera.position.z){
-            this.floor[i].position.z+=(this.tileHeight*2);
-          }
-	 }
- }
 function createScoreText() {
 	// add 3D text
 	materialFront = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
