@@ -22,6 +22,7 @@ var textMesh, textGeom, textParams, textMaterial, textWidth;
 var score = 0;
 
 var targetList = [];
+var floor = []; //ground is loaded into floor array, for updating alonsgide camera
 var projector, mouse = { x: 0, y: 0 };
 var cameraZPosition = 400;
 var cameraYPosition = 150;
@@ -125,7 +126,6 @@ function init()
 	scene.add( skyBox );
 
 	createScoreText();
-
 	createFloor();
 
 	// when the mouse moves, call the given function
@@ -137,17 +137,38 @@ function init()
 }
 
 function createFloor(){
-	var floorTexture = new THREE.ImageUtils.loadTexture( 'images/mars.jpg' );
-	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
-	floorTexture.repeat.set( 10, 10 );
-	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
-	var floorGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
-	var floor = new THREE.Mesh(floorGeometry, floorMaterial);
-	floor.position.y = -0.5;
-	floor.rotation.x = Math.PI / 2;
-	scene.add(floor);
+    //every 100px on the z axis, add a bit of ground
+    //for ( var z= 100; z > -200; z-=100 ) {
+			var groundTexture = new THREE.ImageUtils.loadTexture( 'images/mars.jpg' );
+			var groundMaterial = new THREE.MeshBasicMaterial( { map: groundTexture, side: THREE.DoubleSide } );
+			var groundGeometry = new THREE.PlaneGeometry(1000, 1000);
+      var ground = new THREE.Mesh(groundGeometry, groundMaterial);
+      //rotate 90 degrees around the xaxis so we can see the terrain
+      ground.rotation.x = -Math.PI/-2;
+      // Then set the z position to where it is in the loop (distance of camera)
+      ground.position.z = cameraZPosition;
+      ground.position.y -=0.5;
+      //add the ground to the scene
+			scene.remove(ground);
+      scene.add(ground);
+      //finally push it to the floor array
+      this.floor.push(ground);
+    //}
 }
 
+function moveWithCamera(){
+	 // loop through each of the 3 floors
+	 for(var i=0; i<this.floor.length; i++) {
+		 //if the camera has moved past the entire square, move the square
+		 if((this.floor[i].position.z - 100)>camera.position.z){
+			 	this.floor[i].position.z-=200;
+		 }
+		 //if the camera has moved past the entire square in the opposite direction, move the square the opposite way
+      else if((this.floor[i].position.z + this.tileHeight)<camera.position.z){
+            this.floor[i].position.z+=(this.tileHeight*2);
+          }
+	 }
+ }
 function createScoreText() {
 	// add 3D text
 	materialFront = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
@@ -253,17 +274,14 @@ function update()
 	}
 	if ( keyboard.pressed("A") ) {
 		cameraZPosition = cameraZPosition - 5;
+		camera.position.set(10,150,cameraZPosition);
+		createFloor();
 	}
-
-
 	if ( keyboard.pressed("D") ) {
 		cameraZPosition = cameraZPosition + 5;
+		camera.position.set(10,150,cameraZPosition);
+		createFloor();
 	}
-
-	if (cameraZPosition == -380)
-		cameraZPosition = 380;
-
-	camera.position.set(10,150,cameraZPosition);
 
 	stats.update();
 }
