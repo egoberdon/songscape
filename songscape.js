@@ -19,6 +19,7 @@ var light, back_light;
 
 var materialFront, materialSide, materialArray;
 var textMesh, textGeom, textParams, textMaterial, textWidth;
+var textZ = -200;
 var score = 0;
 
 var targetList = [];
@@ -143,6 +144,9 @@ function createFaces(){
 	});
 }
 
+function placeFaces(){
+
+}
 function createFloor(){
 		var floorTexture = new THREE.ImageUtils.loadTexture( 'images/mars.jpg' );
 		var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
@@ -173,7 +177,7 @@ function createScoreText() {
 	textMesh = new THREE.Mesh(textGeom, textMaterial );
 	textGeom.computeBoundingBox();
 	textWidth = textGeom.boundingBox.max.x - textGeom.boundingBox.min.x;
-	textMesh.position.set(-450, 125, -200);
+	textMesh.position.set(-450, 125, textZ);
 	textMesh.rotation.x = -Math.PI / 4;
 	scene.add(textMesh);
 }
@@ -183,18 +187,16 @@ function refreshText() {
 	createScoreText();
 }
 
-//this function updates the z location for the skybox, the ground,
+//this function updates the z location for the skybox, the ground, the lights, the 3D Text
 //TODO: update z for the faces, the lights, the 3D Text
 function movement(){
 	cameraZPosition = cameraZPosition - 5;
 	camera.position.setZ(cameraZPosition);
 	floor.position.setZ(cameraZPosition - 400);
-	textMesh.position.setZ(cameraZPosition - 600);
+	textZ = cameraZPosition - 600;
+	textMesh.position.setZ(textZ);
 	sun.position.setZ(cameraZPosition - 900);
 	back_light.position.setZ(cameraZPosition + 100);
-	// if (cameraZPosition % 200 == 0){
-	// 	floor.position.setZ(cameraZPosition - 400);
-	// }
 	if (cameraZPosition % 1000 == 0){
 		skyBox.position.setZ(cameraZPosition - 500);
 	}
