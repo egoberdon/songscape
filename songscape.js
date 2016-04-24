@@ -15,7 +15,7 @@ var steve_mode = false; //steve mode boolean flag
 
 //lighting
 var sun, sun_y;
-var light;
+var light, back_light;
 
 var materialFront, materialSide, materialArray;
 var textMesh, textGeom, textParams, textMaterial, textWidth;
@@ -68,7 +68,7 @@ function init()
 	light = new THREE.DirectionalLight(0xffffff);
 	light.intensity = 3;
 
-	var back_light = new THREE.DirectionalLight(0xffffff); //add a little light behind camera to fake ambient effect
+	back_light = new THREE.DirectionalLight(0xffffff); //add a little light behind camera to fake ambient effect
 	back_light.intensity = .25;
 	back_light.position.set(200,100,500);
 	scene.add(back_light);
@@ -189,6 +189,9 @@ function movement(){
 	cameraZPosition = cameraZPosition - 5;
 	camera.position.setZ(cameraZPosition);
 	floor.position.setZ(cameraZPosition - 400);
+	textMesh.position.setZ(cameraZPosition - 600);
+	sun.position.setZ(cameraZPosition - 900);
+	back_light.position.setZ(cameraZPosition + 100);
 	// if (cameraZPosition % 200 == 0){
 	// 	floor.position.setZ(cameraZPosition - 400);
 	// }
