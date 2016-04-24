@@ -144,8 +144,25 @@ function createFaces(){
 	});
 }
 
-function placeFaces(){
-
+//TODO: fix this loop
+function placeFaces(zFacePosition){
+	var zFacePosition = 200; // starting z-coordinate for faces
+	for (var i = 0; i < 4; i++) {
+		// left row
+		faceLeft = new THREE.Mesh(geometry,leftShapeMaterial);
+		faceLeft.position.set(-100, 50, zFacePosition);
+		faceLeft.scale.set(3,3,3);
+		scene.add(faceLeft);
+		targetList.push(faceLeft); //update score when face is clicked
+		// right row
+		faceRight = new THREE.Mesh(geometry,rightShapeMaterial);
+		faceRight.position.set(100, 50, zFacePosition);
+		faceRight.scale.set(3,3,3);
+		faceRight.rotateY(180);
+		scene.add(faceRight);
+		targetList.push(faceRight); //update score when face is clicked
+		zFacePosition -= 150; // go deeper
+	}
 }
 function createFloor(){
 		var floorTexture = new THREE.ImageUtils.loadTexture( 'images/mars.jpg' );
@@ -197,6 +214,7 @@ function movement(){
 	textMesh.position.setZ(textZ);
 	sun.position.setZ(cameraZPosition - 900);
 	back_light.position.setZ(cameraZPosition + 100);
+	placeFaces(cameraZPosition - 200);
 	if (cameraZPosition % 1000 == 0){
 		skyBox.position.setZ(cameraZPosition - 500);
 	}
