@@ -22,14 +22,11 @@ var textMesh, textGeom, textParams, textMaterial, textWidth;
 var score = 0;
 
 var targetList = [];
-var floor;
-var skyBox;
 var projector, mouse = { x: 0, y: 0 };
 var cameraZPosition = 400;
 var cameraYPosition = 150;
 
-var moving = false; //boolean flag for movement
-
+var cube;
 
 init();
 animate();
@@ -83,37 +80,6 @@ function init()
 	light.position = sun.position; //these are the same
 	scene.add(light);
 
-	createScoreText();
-	createFloor();
-	createSky();
-	createFaces();
-
-	// when the mouse moves, call the given function
-	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
-
-	// initialize object to perform world/screen calculations
-	projector = new THREE.Projector();
-
-}
-
-function createSky(){
-	//CODE FROM Stemkoski Skybox.html; TODO: customize with own sky images/textures
-	var imagePrefix = "images/space-";
-	var directions  = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
-	var imageSuffix = ".jpg";
-	var skyGeometry = new THREE.CubeGeometry( 5000, 5000, 5000 );
-	var materialArray = [];
-	for (var i = 0; i < 6; i++)
-		materialArray.push( new THREE.MeshBasicMaterial({
-			map: THREE.ImageUtils.loadTexture( imagePrefix + directions[i] + imageSuffix ),
-			side: THREE.BackSide
-		}));
-	var skyMaterial = new THREE.MeshFaceMaterial( materialArray );
-	skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
-	scene.add(skyBox);
-}
-
-function createFaces(){
 	if (steve_mode){
 		face = steve;
 	}
@@ -123,7 +89,7 @@ function createFaces(){
 		var faceRight;
 		var leftShapeMaterial = new THREE.MeshPhongMaterial( { color:0xff0000, transparent:true, opacity:1, ambient:0xff0000 } );
 		var rightShapeMaterial = new THREE.MeshPhongMaterial( { color:0xfff000, transparent:true, opacity:1, ambient:0xfff000 } );
-		var zFacePosition = 200; // starting z-coordinate for faces
+		var zFacePosition = 200; // starting z-coordinate for spheres
 		for (var i = 0; i < 4; i++) {
 			// left row
 			faceLeft = new THREE.Mesh(geometry,leftShapeMaterial);
@@ -141,20 +107,64 @@ function createFaces(){
 			zFacePosition -= 150; // go deeper
 		}
 	});
+
+	//CODE FROM Stemkoski Skybox.html; TODO: customize with own sky images/textures
+	var imagePrefix = "images/space-";
+	var directions  = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
+		var imageSuffix = ".jpg";
+		var skyGeometry = new THREE.CubeGeometry( 5000, 5000, 5000 );
+
+			var materialArray = [];
+	for (var i = 0; i < 6; i++)
+		materialArray.push( new THREE.MeshBasicMaterial({
+			map: THREE.ImageUtils.loadTexture( imagePrefix + directions[i] + imageSuffix ),
+			side: THREE.BackSide
+		}));
+	var skyMaterial = new THREE.MeshFaceMaterial( materialArray );
+	var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
+	scene.add( skyBox );
+	
+	// var cube = new THREE.Mesh(
+ //    new THREE.CubeGeometry( 20, 20, 20 ),
+ //    new THREE.MeshBasicMaterial( { color: 0x0000ff } )
+ //  );
+	// cube.position.set(10, 50, 0);
+	// scene.add( cube );
+
+	var cubeGeom = new THREE.CubeGeometry(30, 30, 30);
+    var material = new THREE.MeshPhongMaterial({
+        color: 0x0000ff,
+        ambient: 0x808080,
+        specular: 0xffffff,
+        shininess: 20,
+        reflectivity: 5.5
+        });
+    cube = new THREE.Mesh(cubeGeom, material);
+    cube.position = new THREE.Vector3(10, 50, 0);
+    scene.add(cube);
+
+	createScoreText();
+
+	createFloor();
+
+	// when the mouse moves, call the given function
+	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+
+	// initialize object to perform world/screen calculations
+	projector = new THREE.Projector();
+
 }
 
 function createFloor(){
-		var floorTexture = new THREE.ImageUtils.loadTexture( 'images/mars.jpg' );
-		var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
-		var floorGeometry = new THREE.PlaneGeometry(1000, 1000);
-    floor = new THREE.Mesh(floorGeometry, floorMaterial);
-    //rotate 90 degrees around the xaxis so we can see the terrain
-    floor.rotation.x = -Math.PI/-2;
-    // Then set the z position to where it is in the loop (distance of camera)
-    floor.position.z = cameraZPosition - 400;
-    floor.position.y -=0.5;
-    //add the floor to the scene
-    scene.add(floor);
+	var floorTexture = new THREE.ImageUtils.loadTexture( 'images/mars.jpg' );
+	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
+	floorTexture.repeat.set( 10, 10 );
+	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
+	var floorGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
+	var floor = new THREE.Mesh(floorGeometry, floorMaterial);
+	floor.position.y = -0.5;
+	floor.rotation.x = Math.PI / 2;
+	scene.add(floor);
 }
 
 function createScoreText() {
@@ -169,10 +179,13 @@ function createScoreText() {
 		material: 0, extrudeMaterial: 1
 	};
 	textGeom = new THREE.TextGeometry( "Score: " + score, textParams);
+
 	textMaterial = new THREE.MeshFaceMaterial(materialArray);
 	textMesh = new THREE.Mesh(textGeom, textMaterial );
+
 	textGeom.computeBoundingBox();
 	textWidth = textGeom.boundingBox.max.x - textGeom.boundingBox.min.x;
+
 	textMesh.position.set(-450, 125, -200);
 	textMesh.rotation.x = -Math.PI / 4;
 	scene.add(textMesh);
@@ -181,23 +194,6 @@ function createScoreText() {
 function refreshText() {
 	scene.remove(textMesh);
 	createScoreText();
-}
-
-//this function updates the z location for the skybox, the ground,
-//TODO: update z for the faces, the lights, the 3D Text
-function movement(){
-	cameraZPosition = cameraZPosition - 5;
-	camera.position.set(10,150,cameraZPosition);
-	if (cameraZPosition % 200 == 0){
-		scene.remove(floor);
-		floor.position.z = cameraZPosition - 400;
-		scene.add(floor);
-	}
-	if (cameraZPosition % 1000 == 0){
-		scene.remove(skyBox);
-		skyBox.position.z = cameraZPosition - 500;
-		scene.add(skyBox);
-	}
 }
 
 function onDocumentMouseDown( event )
@@ -239,15 +235,12 @@ function onDocumentMouseDown( event )
 function animate()
 {
   requestAnimationFrame( animate );
-	if (moving){
-		movement();
-	}
 	render();
 	update();
 }
 
 function update()
-//if sun moves underfloor or above 1000 it no longer shines
+//if sun moves underground or above 1000 it no longer shines
 {
 	if ( keyboard.pressed("up") ) //sun rises, light decreases, max 1,000
 	{
@@ -277,10 +270,27 @@ function update()
 		score++;
 		refreshText(); //add 1 to 3D Score Text
 	}
-	//s toggles movement
-	if (keyboard.pressed("S")){
-		moving = ! moving;
+	if ( keyboard.pressed("A") ) {
+		cameraZPosition = cameraZPosition - 5;
 	}
+
+
+	if ( keyboard.pressed("D") ) {
+		cameraZPosition = cameraZPosition + 5;
+	}
+
+	if (cameraZPosition == -380)
+		cameraZPosition = 380;
+
+	camera.position.set(10,150,cameraZPosition);
+
+	if(typeof dataArray === 'object' && dataArray.length > 0) {
+		var k = 0;
+		var scale = dataArray[k] / 15;
+		cube.scale.z = (scale < 1 ? 1 : scale);
+		k += (k < dataArray.length ? 1 : 0);
+	}
+
 	stats.update();
 }
 
