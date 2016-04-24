@@ -22,6 +22,7 @@ var textMesh, textGeom, textParams, textMaterial, textWidth;
 var score = 0;
 
 var targetList = [];
+var ground;
 var floor = []; //ground is loaded into floor array, for updating alonsgide camera
 var projector, mouse = { x: 0, y: 0 };
 var cameraZPosition = 400;
@@ -142,14 +143,13 @@ function createFloor(){
 			var groundTexture = new THREE.ImageUtils.loadTexture( 'images/mars.jpg' );
 			var groundMaterial = new THREE.MeshBasicMaterial( { map: groundTexture, side: THREE.DoubleSide } );
 			var groundGeometry = new THREE.PlaneGeometry(1000, 1000);
-      var ground = new THREE.Mesh(groundGeometry, groundMaterial);
+      ground = new THREE.Mesh(groundGeometry, groundMaterial);
       //rotate 90 degrees around the xaxis so we can see the terrain
       ground.rotation.x = -Math.PI/-2;
       // Then set the z position to where it is in the loop (distance of camera)
-      ground.position.z = cameraZPosition;
+      ground.position.z = cameraZPosition - 400;
       ground.position.y -=0.5;
       //add the ground to the scene
-			scene.remove(ground);
       scene.add(ground);
       //finally push it to the floor array
       this.floor.push(ground);
@@ -275,14 +275,15 @@ function update()
 	if ( keyboard.pressed("A") ) {
 		cameraZPosition = cameraZPosition - 5;
 		camera.position.set(10,150,cameraZPosition);
-		createFloor();
 	}
 	if ( keyboard.pressed("D") ) {
 		cameraZPosition = cameraZPosition + 5;
 		camera.position.set(10,150,cameraZPosition);
+	}
+	if (cameraZPosition % 200 == 0){
+		scene.remove(ground);
 		createFloor();
 	}
-
 	stats.update();
 }
 
