@@ -28,6 +28,7 @@ var projector, mouse = { x: 0, y: 0 };
 var cameraZPosition = 400;
 var cameraYPosition = 150;
 
+var moving = false; //boolean flag for movement
 
 
 init();
@@ -234,9 +235,21 @@ function onDocumentMouseDown( event )
 
 }
 
+function movement(){
+	cameraZPosition = cameraZPosition - 5;
+	camera.position.set(10,150,cameraZPosition);
+	if (cameraZPosition % 200 == 0){
+		scene.remove(ground);
+		createFloor();
+	}
+}
+
 function animate()
 {
   requestAnimationFrame( animate );
+	if (moving){
+		movement();
+	}
 	render();
 	update();
 }
@@ -272,17 +285,9 @@ function update()
 		score++;
 		refreshText(); //add 1 to 3D Score Text
 	}
-	if ( keyboard.pressed("A") ) {
-		cameraZPosition = cameraZPosition - 5;
-		camera.position.set(10,150,cameraZPosition);
-	}
-	if ( keyboard.pressed("D") ) {
-		cameraZPosition = cameraZPosition + 5;
-		camera.position.set(10,150,cameraZPosition);
-	}
-	if (cameraZPosition % 200 == 0){
-		scene.remove(ground);
-		createFloor();
+	//s toggles movement
+	if (keyboard.pressed("S")){
+		moving = ! moving;
 	}
 	stats.update();
 }
