@@ -16,6 +16,6 @@ for it to work correctly
 
 ##Current Controls
 
-'A' key -> move forward
-'D' key -> move backward
-Mouse Click on face -> 1 point
+'A' key -> move forward  
+'D' key -> move backward  
+Mouse Click on face -> 1 point  
