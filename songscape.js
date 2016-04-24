@@ -23,6 +23,7 @@ var score = 0;
 
 var targetList = [];
 var floor;
+var skyBox;
 var projector, mouse = { x: 0, y: 0 };
 var cameraZPosition = 400;
 var cameraYPosition = 150;
@@ -82,6 +83,37 @@ function init()
 	light.position = sun.position; //these are the same
 	scene.add(light);
 
+	createScoreText();
+	createFloor();
+	createSky();
+	createFaces();
+
+	// when the mouse moves, call the given function
+	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+
+	// initialize object to perform world/screen calculations
+	projector = new THREE.Projector();
+
+}
+
+function createSky(){
+	//CODE FROM Stemkoski Skybox.html; TODO: customize with own sky images/textures
+	var imagePrefix = "images/space-";
+	var directions  = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
+	var imageSuffix = ".jpg";
+	var skyGeometry = new THREE.CubeGeometry( 5000, 5000, 5000 );
+	var materialArray = [];
+	for (var i = 0; i < 6; i++)
+		materialArray.push( new THREE.MeshBasicMaterial({
+			map: THREE.ImageUtils.loadTexture( imagePrefix + directions[i] + imageSuffix ),
+			side: THREE.BackSide
+		}));
+	var skyMaterial = new THREE.MeshFaceMaterial( materialArray );
+	skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
+	scene.add(skyBox);
+}
+
+function createFaces(){
 	if (steve_mode){
 		face = steve;
 	}
@@ -91,7 +123,7 @@ function init()
 		var faceRight;
 		var leftShapeMaterial = new THREE.MeshPhongMaterial( { color:0xff0000, transparent:true, opacity:1, ambient:0xff0000 } );
 		var rightShapeMaterial = new THREE.MeshPhongMaterial( { color:0xfff000, transparent:true, opacity:1, ambient:0xfff000 } );
-		var zFacePosition = 200; // starting z-coordinate for spheres
+		var zFacePosition = 200; // starting z-coordinate for faces
 		for (var i = 0; i < 4; i++) {
 			// left row
 			faceLeft = new THREE.Mesh(geometry,leftShapeMaterial);
@@ -109,32 +141,6 @@ function init()
 			zFacePosition -= 150; // go deeper
 		}
 	});
-
-	//CODE FROM Stemkoski Skybox.html; TODO: customize with own sky images/textures
-	var imagePrefix = "images/space-";
-	var directions  = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
-		var imageSuffix = ".jpg";
-		var skyGeometry = new THREE.CubeGeometry( 5000, 5000, 5000 );
-
-			var materialArray = [];
-	for (var i = 0; i < 6; i++)
-		materialArray.push( new THREE.MeshBasicMaterial({
-			map: THREE.ImageUtils.loadTexture( imagePrefix + directions[i] + imageSuffix ),
-			side: THREE.BackSide
-		}));
-	var skyMaterial = new THREE.MeshFaceMaterial( materialArray );
-	var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
-	scene.add( skyBox );
-
-	createScoreText();
-	createFloor();
-
-	// when the mouse moves, call the given function
-	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
-
-	// initialize object to perform world/screen calculations
-	projector = new THREE.Projector();
-
 }
 
 function createFloor(){
@@ -163,13 +169,10 @@ function createScoreText() {
 		material: 0, extrudeMaterial: 1
 	};
 	textGeom = new THREE.TextGeometry( "Score: " + score, textParams);
-
 	textMaterial = new THREE.MeshFaceMaterial(materialArray);
 	textMesh = new THREE.Mesh(textGeom, textMaterial );
-
 	textGeom.computeBoundingBox();
 	textWidth = textGeom.boundingBox.max.x - textGeom.boundingBox.min.x;
-
 	textMesh.position.set(-450, 125, -200);
 	textMesh.rotation.x = -Math.PI / 4;
 	scene.add(textMesh);
@@ -178,6 +181,23 @@ function createScoreText() {
 function refreshText() {
 	scene.remove(textMesh);
 	createScoreText();
+}
+
+//this function updates the z location for the skybox, the ground,
+//TODO: update z for the faces, the lights, the 3D Text
+function movement(){
+	cameraZPosition = cameraZPosition - 5;
+	camera.position.set(10,150,cameraZPosition);
+	if (cameraZPosition % 200 == 0){
+		scene.remove(floor);
+		floor.position.z = cameraZPosition - 400;
+		scene.add(floor);
+	}
+	if (cameraZPosition % 1000 == 0){
+		scene.remove(skyBox);
+		skyBox.position.z = cameraZPosition - 500;
+		scene.add(skyBox);
+	}
 }
 
 function onDocumentMouseDown( event )
@@ -214,15 +234,6 @@ function onDocumentMouseDown( event )
 		// intersects[ 0 ].object.geometry.colorsNeedUpdate = true;
 	}
 
-}
-
-function movement(){
-	cameraZPosition = cameraZPosition - 5;
-	camera.position.set(10,150,cameraZPosition);
-	if (cameraZPosition % 200 == 0){
-		scene.remove(floor);
-		createFloor();
-	}
 }
 
 function animate()
