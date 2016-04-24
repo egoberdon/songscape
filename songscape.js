@@ -187,16 +187,13 @@ function refreshText() {
 //TODO: update z for the faces, the lights, the 3D Text
 function movement(){
 	cameraZPosition = cameraZPosition - 5;
-	camera.position.set(10,150,cameraZPosition);
-	if (cameraZPosition % 200 == 0){
-		scene.remove(floor);
-		floor.position.z = cameraZPosition - 400;
-		scene.add(floor);
-	}
+	camera.position.setZ(cameraZPosition);
+	floor.position.setZ(cameraZPosition - 400);
+	// if (cameraZPosition % 200 == 0){
+	// 	floor.position.setZ(cameraZPosition - 400);
+	// }
 	if (cameraZPosition % 1000 == 0){
-		scene.remove(skyBox);
-		skyBox.position.z = cameraZPosition - 500;
-		scene.add(skyBox);
+		skyBox.position.setZ(cameraZPosition - 500);
 	}
 }
 
@@ -279,6 +276,7 @@ function update()
 	}
 	//s toggles movement
 	if (keyboard.pressed("S")){
+		console.log("pressed s");
 		moving = ! moving;
 	}
 	stats.update();
