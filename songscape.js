@@ -56,7 +56,7 @@ function init()
 	camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
 	scene.add(camera);
 	//camera.position.set(10,150,400);
-	camera.position.set(10,150,cameraZPosition);
+	camera.position.set(10,50,cameraZPosition);
 	camera.lookAt(scene.position);
 	//camera.lookAt(new THREE.Vector3(10,150,4000));
 	// RENDERER
@@ -136,7 +136,7 @@ function createFaces(){
 		var leftShapeMaterial = new THREE.MeshPhongMaterial( { color:0xff0000, transparent:true, opacity:1, ambient:0xff0000 } );
 		var rightShapeMaterial = new THREE.MeshPhongMaterial( { color:0xfff000, transparent:true, opacity:1, ambient:0xfff000 } );
 		var zFacePosition = 200; // starting z-coordinate for faces
-		for (var i = 0; i < 4; i++) {
+		for (var i = 0; i < 6; i++) {
 			// left row
 			faceLeft = new THREE.Mesh(geometry,leftShapeMaterial);
 			faceLeft.position.set(-100, 50, zFacePosition);
@@ -156,18 +156,18 @@ function createFaces(){
 }
 
 function updateFaces(zFacePosition){
-	for (var i = 0; i < 8; i+=2) {
-		var leftFace = targetList[i];
-		var rightFace = targetList[i+1];
+		var leftFace = targetList.shift();
+		var rightFace = targetList.shift();
 		leftFace.position.setZ(zFacePosition);
 		rightFace.position.setZ(zFacePosition);
-		zFacePosition -= 150; // go deeper
-	}
+		targetList.push(leftFace);
+		targetList.push(rightFace);
 }
+
 function createFloor(){
 		var floorTexture = new THREE.ImageUtils.loadTexture( 'images/mars.jpg' );
 		var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
-		var floorGeometry = new THREE.PlaneGeometry(1000, 1000);
+		var floorGeometry = new THREE.PlaneGeometry(5000, 5000);
     floor = new THREE.Mesh(floorGeometry, floorMaterial);
     //rotate 90 degrees around the xaxis so we can see the terrain
     floor.rotation.x = -Math.PI/-2;
@@ -209,13 +209,15 @@ function refreshText() {
 function movement(){
 	cameraZPosition = cameraZPosition - 5;
 	camera.position.setZ(cameraZPosition);
-	floor.position.setZ(cameraZPosition - 400);
 	textZ = cameraZPosition - 600; //to make sure refreshText still works
 	textMesh.position.setZ(textZ);
 	sun.position.setZ(cameraZPosition - 900);
 	//back_light.position.setZ(cameraZPosition + 100);
-	updateFaces(cameraZPosition - 200);
+	if (cameraZPosition % 150 == 0){
+		updateFaces(cameraZPosition - 950); //950 is 5 * -150 number of rows minus additional 200 as reference to camera position
+	}
 	if (cameraZPosition % 1000 == 0){
+		floor.position.setZ(cameraZPosition - 400);
 		skyBox.position.setZ(cameraZPosition - 500);
 	}
 }
