@@ -16,6 +16,5 @@ for it to work correctly
 
 ##User Controls
 
-'A' key -> move forward  
-'D' key -> move backward  
+'S' starts automatic movement in scene
 Mouse Click on face -> 1 point  
