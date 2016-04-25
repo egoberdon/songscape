@@ -165,15 +165,17 @@ function updateFaces(zFacePosition){
 	}
 }
 function createFloor(){
-	var floorTexture = new THREE.ImageUtils.loadTexture( 'images/mars.jpg' );
-	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
-	floorTexture.repeat.set( 10, 10 );
-	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
-	var floorGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
-	var floor = new THREE.Mesh(floorGeometry, floorMaterial);
-	floor.position.y = -0.5;
-	floor.rotation.x = Math.PI / 2;
-	scene.add(floor);
+		var floorTexture = new THREE.ImageUtils.loadTexture( 'images/mars.jpg' );
+		var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
+		var floorGeometry = new THREE.PlaneGeometry(1000, 1000);
+    floor = new THREE.Mesh(floorGeometry, floorMaterial);
+    //rotate 90 degrees around the xaxis so we can see the terrain
+    floor.rotation.x = -Math.PI/-2;
+    // Then set the z position to where it is in the loop (distance of camera)
+    floor.position.z = cameraZPosition - 400;
+    floor.position.y -=0.5;
+    //add the floor to the scene
+    scene.add(floor);
 }
 
 function createScoreText() {
@@ -257,7 +259,9 @@ function onDocumentMouseDown( event )
 function animate()
 {
   requestAnimationFrame( animate );
-
+	if (moving){
+		movement()
+	}
 	render();
 	update();
 }
