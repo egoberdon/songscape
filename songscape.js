@@ -26,7 +26,17 @@ var projector, mouse = { x: 0, y: 0 };
 var cameraZPosition = 400;
 var cameraYPosition = 150;
 
+var rVal = 255;
+var gVal = 0;
+var bVal = 255;
 
+var rUp = true;
+var gUp = true;
+var bUp = true;
+
+var logCount = 0;
+
+var cube;
 
 init();
 animate();
@@ -265,7 +275,53 @@ function update()
 
 	camera.position.set(10,150,cameraZPosition);
 
+	if(typeof dataArray === 'object' && dataArray.length > 0) {
+		var k = 0;
+		var scale = dataArray[k] / 45;
+		var hex = rgbToHex(rVal, bVal, gVal);
+		if (targetList[0] != null && targetList[1] != null) {
+			
+			targetList[0].material.color.setHex( hex );
+			targetList[1].material.color.setHex( hex );
+			for (var w = 0; w < targetList.length; w++) {
+				targetList[w].scale.y = (scale < 1 ? 1 : scale);
+			}
+
+
+		}
+
+		if (gVal >= 255) gUp = false;
+		if (gVal == 0) gUp = true;
+		if (gUp) gVal += 5;
+		else gVal -= 5;
+
+		k += (k < dataArray.length ? 1 : 0);
+	}
+
+
+
 	stats.update();
+}
+
+function frequencySum() {
+	var freqSum = 0;
+	for (var q = 0; q < dataArray.length; q++) {
+		freqSum += dataArray[q]; 
+	}
+	return freqSum;
+}
+
+function averageFrequency() {
+	return frequencySum() / dataArray.length;
+}
+
+function componentToHex(c) {
+    var hexa = c.toString(16);
+    return hexa.length == 1 ? "0" + hexa : hexa;
+}
+
+function rgbToHex(r, g, b) {
+    return "0x" + componentToHex(r) + componentToHex(g) + componentToHex(b);
 }
 
 function render()
