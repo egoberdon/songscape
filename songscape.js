@@ -29,8 +29,19 @@ var projector, mouse = { x: 0, y: 0 };
 var cameraZPosition = 400;
 var cameraYPosition = 150;
 
-var moving = false; //boolean flag for movement
+var rVal = 255;
+var gVal = 0;
+var bVal = 255;
 
+var rUp = true;
+var gUp = true;
+var bUp = true;
+
+var logCount = 0;
+
+var cube;
+
+var moving = false;
 
 init();
 animate();
@@ -84,9 +95,9 @@ function init()
 	light.position = sun.position; //these are the same
 	scene.add(light);
 
+	createSky();
 	createScoreText();
 	createFloor();
-	createSky();
 	createFaces();
 
 	// when the mouse moves, call the given function
@@ -154,17 +165,15 @@ function updateFaces(zFacePosition){
 	}
 }
 function createFloor(){
-		var floorTexture = new THREE.ImageUtils.loadTexture( 'images/mars.jpg' );
-		var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
-		var floorGeometry = new THREE.PlaneGeometry(1000, 1000);
-    floor = new THREE.Mesh(floorGeometry, floorMaterial);
-    //rotate 90 degrees around the xaxis so we can see the terrain
-    floor.rotation.x = -Math.PI/-2;
-    // Then set the z position to where it is in the loop (distance of camera)
-    floor.position.z = cameraZPosition - 400;
-    floor.position.y -=0.5;
-    //add the floor to the scene
-    scene.add(floor);
+	var floorTexture = new THREE.ImageUtils.loadTexture( 'images/mars.jpg' );
+	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
+	floorTexture.repeat.set( 10, 10 );
+	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
+	var floorGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
+	var floor = new THREE.Mesh(floorGeometry, floorMaterial);
+	floor.position.y = -0.5;
+	floor.rotation.x = Math.PI / 2;
+	scene.add(floor);
 }
 
 function createScoreText() {
@@ -179,8 +188,10 @@ function createScoreText() {
 		material: 0, extrudeMaterial: 1
 	};
 	textGeom = new THREE.TextGeometry( "Score: " + score, textParams);
+
 	textMaterial = new THREE.MeshFaceMaterial(materialArray);
 	textMesh = new THREE.Mesh(textGeom, textMaterial );
+
 	textGeom.computeBoundingBox();
 	textWidth = textGeom.boundingBox.max.x - textGeom.boundingBox.min.x;
 	textMesh.position.set(-450, 125, textZ);
@@ -193,8 +204,6 @@ function refreshText() {
 	createScoreText();
 }
 
-//this function updates the z location for the skybox, the ground, the lights, the 3D Text
-//TODO: update z for the faces
 function movement(){
 	cameraZPosition = cameraZPosition - 5;
 	camera.position.setZ(cameraZPosition);
@@ -248,15 +257,13 @@ function onDocumentMouseDown( event )
 function animate()
 {
   requestAnimationFrame( animate );
-	if (moving){
-		movement();
-	}
+
 	render();
 	update();
 }
 
 function update()
-//if sun moves underfloor or above 1000 it no longer shines
+//if sun moves underground or above 1000 it no longer shines
 {
 	if ( keyboard.pressed("up") ) //sun rises, light decreases, max 1,000
 	{
@@ -291,7 +298,49 @@ function update()
 		console.log("pressed s");
 		moving = ! moving;
 	}
+	if(typeof dataArray === 'object' && dataArray.length > 0) {
+		var k = 0;
+		var scale = dataArray[k] / 45;
+		var hex = rgbToHex(rVal, bVal, gVal);
+		if (targetList[0] != null && targetList[1] != null) {
+
+			targetList[0].material.color.setHex( hex );
+			targetList[1].material.color.setHex( hex );
+			for (var w = 0; w < targetList.length; w++) {
+				targetList[w].scale.y = (scale < 1 ? 1 : scale);
+			}
+		}
+
+		if (gVal >= 255) gUp = false;
+		if (gVal == 0) gUp = true;
+		if (gUp) gVal += 5;
+		else gVal -= 5;
+
+		k += (k < dataArray.length ? 1 : 0);
+	}
+
 	stats.update();
+}
+
+function frequencySum() {
+	var freqSum = 0;
+	for (var q = 0; q < dataArray.length; q++) {
+		freqSum += dataArray[q];
+	}
+	return freqSum;
+}
+
+function averageFrequency() {
+	return frequencySum() / dataArray.length;
+}
+
+function componentToHex(c) {
+    var hexa = c.toString(16);
+    return hexa.length == 1 ? "0" + hexa : hexa;
+}
+
+function rgbToHex(r, g, b) {
+    return "0x" + componentToHex(r) + componentToHex(g) + componentToHex(b);
 }
 
 function render()
