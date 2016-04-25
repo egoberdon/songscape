@@ -14,6 +14,7 @@ var analyser = ctx.createAnalyser(); //returns an AnalyserNode, which provides r
 //var analyser;
 var dataArray;
 var boost = 0;
+var time = 0;
 
 var mp3_location = 'mp3/sample.mp3';
 var WIDTH = 800;
@@ -57,9 +58,8 @@ function stop(){
 }
 
 analyser.fftSize = 2048;
-var bufferLength = analyser.frequencyBinCount;
-console.log(bufferLength);
-dataArray = new Uint8Array(bufferLength);
+var bufferLength = analyser.frequencyBinCount; //bufferLength == 1024
+dataArray = new Uint8Array(bufferLength); //dataArray length == 1024, each element can be between 0 and 255
 //canvasCtx.clearRect(0,0, WIDTH, HEIGHT);
 
 function draw(){
@@ -67,17 +67,21 @@ function draw(){
 
   //copies the current wave-form/time domain into a Uint8Array called dataArray
   analyser.getByteTimeDomainData(dataArray); //grab the time domain data and copy it into our array
+
   var sliceWidth = WIDTH * 1.0 / bufferLength; //determine the width of each segment of the line to be drawn by dividing the canvas width by the array length
   var x = 0;
   var y;
+
   //this loop runs every frame
   for(var i = 0; i < bufferLength; i++) { //run through a loop, defining the position of a small segment of the wave for each point in the buffer at a certain height based on the data point value form the array
     
+
     var v = dataArray[i] / 128.0;
     y = v * HEIGHT/2; //defines the y-position for the waves, with 0 at the top and increasing downwards
 
     x += sliceWidth;
   }
+
 }
 
 draw();
