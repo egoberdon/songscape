@@ -144,23 +144,12 @@ function createFaces(){
 	});
 }
 
-//TODO: fix this loop
-function placeFaces(zFacePosition){
-	var zFacePosition = 200; // starting z-coordinate for faces
-	for (var i = 0; i < 4; i++) {
-		// left row
-		faceLeft = new THREE.Mesh(geometry,leftShapeMaterial);
-		faceLeft.position.set(-100, 50, zFacePosition);
-		faceLeft.scale.set(3,3,3);
-		scene.add(faceLeft);
-		targetList.push(faceLeft); //update score when face is clicked
-		// right row
-		faceRight = new THREE.Mesh(geometry,rightShapeMaterial);
-		faceRight.position.set(100, 50, zFacePosition);
-		faceRight.scale.set(3,3,3);
-		faceRight.rotateY(180);
-		scene.add(faceRight);
-		targetList.push(faceRight); //update score when face is clicked
+function updateFaces(zFacePosition){
+	for (var i = 0; i < 8; i+=2) {
+		var leftFace = targetList[i];
+		var rightFace = targetList[i+1];
+		leftFace.position.setZ(zFacePosition);
+		rightFace.position.setZ(zFacePosition);
 		zFacePosition -= 150; // go deeper
 	}
 }
@@ -205,16 +194,16 @@ function refreshText() {
 }
 
 //this function updates the z location for the skybox, the ground, the lights, the 3D Text
-//TODO: update z for the faces, the lights, the 3D Text
+//TODO: update z for the faces
 function movement(){
 	cameraZPosition = cameraZPosition - 5;
 	camera.position.setZ(cameraZPosition);
 	floor.position.setZ(cameraZPosition - 400);
-	textZ = cameraZPosition - 600;
+	textZ = cameraZPosition - 600; //to make sure refreshText still works
 	textMesh.position.setZ(textZ);
 	sun.position.setZ(cameraZPosition - 900);
-	back_light.position.setZ(cameraZPosition + 100);
-	placeFaces(cameraZPosition - 200);
+	//back_light.position.setZ(cameraZPosition + 100);
+	updateFaces(cameraZPosition - 200);
 	if (cameraZPosition % 1000 == 0){
 		skyBox.position.setZ(cameraZPosition - 500);
 	}
