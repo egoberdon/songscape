@@ -226,11 +226,11 @@ function createAnyText(message, isCreating) {
 	
 	//start z-coordinate at -200 if it's being created rather than refreshed
 	if (isCreating == true) {
-		myMesh.position.set(-50, 125, -200);
-		console.log("isCreating");
+		myMesh.position.set(-50, 75, cameraZPosition - 600);
+		textAnyZ = cameraZPosition - 600;
 	}
 	else {
-		myMesh.position.set(-50, 125, textAnyZ);
+		myMesh.position.set(-50, 75, textAnyZ);
 	}
 	myMesh.rotation.x = -Math.PI / 4;
 	scene.add(myMesh);
@@ -332,22 +332,17 @@ function update()
 	}
 	//s toggles movement
 	if (keyboard.pressed("S")){
-		console.log("pressed s");
 		moving = ! moving;
 	}
 	if (showMessage == true) {
 
 		messageIsShowing = true;
-
+		//textAnyZ = cameraZPosition - 600;
 		if (myMesh != undefined) {
-			myMesh.position.setZ(textAnyZ);
+			myMesh.position.setZ(textAnyZ); //update z position
+			textAnyZ += 20;
 		}
-		else {
-			console.log("undefined......");
-		}
-		textAnyZ += 20;
-		if (myMesh.position.z == (cameraZPosition + 20)) {
-			console.log("disappear");
+		if (myMesh.position.z >= (cameraZPosition + 20)) {
 			showMessage = false;
 		}
 		refreshAnyText(message);
@@ -356,10 +351,9 @@ function update()
 	if (showMessage == false) {
 		//the 3DText can only be removed if it has been added in the first place
 		if (messageIsShowing == true) {
-			console.log("removing");
 			scene.remove(myMesh);
 			messageIsShowing = false;
-			textAnyZ = -200;
+			//textAnyZ = cameraZPosition - 600;
 		}
 	}
 	if(typeof dataArray === 'object' && dataArray.length > 0) {
