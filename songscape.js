@@ -17,10 +17,18 @@ var steve_mode = false; //steve mode boolean flag
 var sun, sun_y;
 var light, back_light;
 
-var materialFront, materialSide, materialArray;
-var textMesh, textGeom, textParams, textMaterial, textWidth;
+var materialFront, materialSide, materialArray; //for faces
+var textMesh, textGeom, textParams, textMaterial, textWidth; //for faces
+var front, side, materials, params, geom, myTextMaterial, width; //for 3D text messages
+var myMesh; //for 3D text messages
 var textZ = -200;
+var textZM = -200;
+var textAnyZ = -200;
 var score = 0;
+
+var message;
+var showMessage = false;
+var messageIsShowing = false;
 
 var targetList = [];
 var floor;
@@ -36,10 +44,6 @@ var bVal = 255;
 var rUp = true;
 var gUp = true;
 var bUp = true;
-
-var logCount = 0;
-
-var cube;
 
 var moving = false;
 
@@ -201,9 +205,46 @@ function createScoreText() {
 	scene.add(textMesh);
 }
 
-function refreshText() {
+function createAnyText(message, isCreating) {
+	// add 3D text
+	front = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+	side = new THREE.MeshBasicMaterial( { color: 0x000088 } );
+	materials = [ front, side ];
+	params = {
+		size: 15, height: 4, curveSegments: 3,
+		font: "helvetiker", weight: "bold", style: "normal",
+		bevelThickness: 1, bevelSize: 2, bevelEnabled: true,
+		material: 0, extrudeMaterial: 1
+	};
+	geom = new THREE.TextGeometry( message, params);
+
+	myTextMaterial = new THREE.MeshFaceMaterial(materials);
+	myMesh = new THREE.Mesh(geom, myTextMaterial );
+
+	geom.computeBoundingBox();
+	width = geom.boundingBox.max.x - geom.boundingBox.min.x;
+	
+	//start z-coordinate at -200 if it's being created rather than refreshed
+	if (isCreating == true) {
+		myMesh.position.set(-50, 125, -200);
+		console.log("isCreating");
+	}
+	else {
+		myMesh.position.set(-50, 125, textAnyZ);
+	}
+	myMesh.rotation.x = -Math.PI / 4;
+	scene.add(myMesh);
+
+}
+
+function refreshScoreText() {
 	scene.remove(textMesh);
 	createScoreText();
+}
+
+function refreshAnyText(str) {
+	scene.remove(myMesh);
+	createAnyText(str, false);
 }
 
 function movement(){
@@ -248,7 +289,8 @@ function onDocumentMouseDown( event )
 	if ( intersects.length > 0 )
 	{
 		score++;
-		refreshText();
+		refreshScoreText();
+		checkShowMessageText(); //check whether a message should be shown (messages shown at 5,10,15, and 25 points)
 
 		// change the color of the closest face.
 		// intersects[ 0 ].face.color.setRGB( 0.8 * Math.random() + 0.2, 0, 0 );
@@ -288,15 +330,37 @@ function update()
 			sun.position.setY(sun_y);
 		}
 	}
-	if ( keyboard.pressed("p") )
-	{
-		score++;
-		refreshText(); //add 1 to 3D Score Text
-	}
 	//s toggles movement
 	if (keyboard.pressed("S")){
 		console.log("pressed s");
 		moving = ! moving;
+	}
+	if (showMessage == true) {
+
+		messageIsShowing = true;
+
+		if (myMesh != undefined) {
+			myMesh.position.setZ(textAnyZ);
+		}
+		else {
+			console.log("undefined......");
+		}
+		textAnyZ += 20;
+		if (myMesh.position.z == (cameraZPosition + 20)) {
+			console.log("disappear");
+			showMessage = false;
+		}
+		refreshAnyText(message);
+	}
+	//this can't be an else because we need to check even if above code executes
+	if (showMessage == false) {
+		//the 3DText can only be removed if it has been added in the first place
+		if (messageIsShowing == true) {
+			console.log("removing");
+			scene.remove(myMesh);
+			messageIsShowing = false;
+			textAnyZ = -200;
+		}
 	}
 	if(typeof dataArray === 'object' && dataArray.length > 0) {
 		var k = 0;
@@ -317,6 +381,39 @@ function update()
 	}
 
 	stats.update();
+}
+
+function checkShowMessageText() {
+	switch(score) {
+		case 5:
+			message = "queue the music";
+			showAndFade(message);
+			break;
+		case 15:
+			message = "a world of color";	
+			showAndFade(message);
+			break;
+		case 25:
+			message = "engines: engaged";
+			showAndFade(message);
+			break;
+		case 35:
+			message = "BOOM!";
+			showAndFade(message);
+			break;
+		default:
+			break;
+	}
+
+}
+
+function showAndFade(str) {
+
+	createAnyText(str, true);
+
+ 	/*this triggers the if-statement in update() to continuously change z-coordinate value for the 3D Text until it's off the screen, at which point it is removed from the scene*/
+	showMessage = true;
+
 }
 
 function frequencySum() {
