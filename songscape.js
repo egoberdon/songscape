@@ -306,9 +306,6 @@ function update()
 
 			targetList[0].material.color.setHex( hex );
 			targetList[1].material.color.setHex( hex );
-			// for (var w = 0; w < targetList.length; w++) {
-			// 	targetList[w].scale.y = (scale < 1 ? 1 : scale);
-			// }
 		}
 
 		if (gVal >= 255) gUp = false;
