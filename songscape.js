@@ -6,7 +6,7 @@ var clock = new THREE.Clock();
 // controls
 var parameters;
 var gui;
-
+var faceCall = 0;
 //face models
 var loader = new THREE.JSONLoader(); // init the loader util
 var face = eli = 'obj/finalFace.json'; //normal eli face
@@ -29,19 +29,23 @@ var projector, mouse = { x: 0, y: 0 };
 var cameraZPosition = 400;
 var cameraYPosition = 150;
 
-var rVal = 255;
-var gVal = 0;
-var bVal = 255;
-
-var rUp = true;
-var gUp = true;
-var bUp = true;
-
 var logCount = 0;
 
 var cube;
 
 var moving = false;
+
+//audio
+
+var ctx = new (window.AudioContext || window.webkitAudioContext)(); //webkitAudioContext is for Safari users; ctx is a container for all sound
+var buf;
+var src, srcJs;
+var analyser = ctx.createAnalyser(); //returns an AnalyserNode, which provides real-time frequency and time-domain analysis information
+analyser.smoothingTimeConstant = 1;
+var dataArray;
+var boost = 0;
+var time = 0;
+var mp3_location = 'mp3/sample.mp3';
 
 init();
 animate();
@@ -99,6 +103,7 @@ function init()
 	createScoreText();
 	createFloor();
 	createFaces();
+	loadFile();
 
 	// when the mouse moves, call the given function
 	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
@@ -106,6 +111,46 @@ function init()
 	// initialize object to perform world/screen calculations
 	projector = new THREE.Projector();
 
+	//audio stuff
+	analyser.fftSize = 2048;
+	var bufferLength = analyser.frequencyBinCount; //bufferLength == 1024
+	dataArray = new Uint8Array(bufferLength); //dataArray length == 1024, each element can be between 0 and 255
+
+}
+
+function loadFile() {
+    var req = new XMLHttpRequest();
+    req.open("GET",mp3_location,true);
+    req.responseType = "arraybuffer";
+    req.onload = function() {
+        //decode the loaded data
+        ctx.decodeAudioData(req.response, function(buffer) {
+            buf = buffer; //the ArrayBuffer is converted to an AudioBuffer, which holds our audio data in memory
+            play();
+        });
+    };
+    req.send();
+}
+
+function play() {
+    //create a source node from the buffer (type: AudioBufferSourceNode)
+    src = ctx.createBufferSource(); //src is the "record player"
+
+    src.buffer = buf; //src.buffer is the "record"
+    src.loop = true;
+
+    //connect to the final output node (the speakers)
+    src.connect(analyser); //connect the record player to the AnalyserNode (where real-time data is)
+
+    analyser.connect(ctx.destination); //ctx.destination is the speakers
+    //play immediately
+    src.start();
+    playing = true;
+}
+
+function stop(){
+  src.stop();
+  console.log("it's over!");
 }
 
 function createSky(){
@@ -221,6 +266,29 @@ function movement(){
 	}
 }
 
+function faceColor(){
+	// if (faceCall < 10000){
+	// 	faceCall++;
+	// }
+	// else{
+	// 	faceCall = 0;
+	// }
+	// console.log(faceCall);
+	if(typeof dataArray === 'object' && dataArray.length > 0) {
+		//var k = 0;
+		//var scale = dataArray[k] / 45;
+		//console.log("k", k, "dataArray[k]",dataArray[k]);
+		console.log(dataArray[0]);
+		var gVal = (dataArray[0] * 100) % 255;
+		//console.log(gVal);
+		if (targetList[0] != null && targetList[1] != null) {
+			targetList[0].material.color.setRGB(100, gVal, 200);
+			targetList[1].material.color.setRGB(100, gVal, 200);
+		}
+		//k += (k < dataArray.length ? 1 : 0);
+	}
+}
+
 function onDocumentMouseDown( event )
 {
 	// the following line would stop any other event handler from firing
@@ -263,6 +331,8 @@ function animate()
 	if (moving){
 		movement()
 	}
+	analyser.getByteTimeDomainData(dataArray); //grab the time domain data and copy it into our array
+	faceColor();
 	render();
 	update();
 }
@@ -298,24 +368,10 @@ function update()
 		console.log("pressed s");
 		moving = ! moving;
 	}
-	if(typeof dataArray === 'object' && dataArray.length > 0) {
-		var k = 0;
-		var scale = dataArray[k] / 45;
-		var hex = rgbToHex(rVal, bVal, gVal);
-		if (targetList[0] != null && targetList[1] != null) {
-
-			targetList[0].material.color.setHex( hex );
-			targetList[1].material.color.setHex( hex );
-		}
-
-		if (gVal >= 255) gUp = false;
-		if (gVal == 0) gUp = true;
-		if (gUp) gVal += 5;
-		else gVal -= 5;
-
-		k += (k < dataArray.length ? 1 : 0);
+	if (keyboard.pressed("x")){
+		stop();
+		console.log("nixxed the music");
 	}
-
 	stats.update();
 }
 
@@ -325,19 +381,6 @@ function frequencySum() {
 		freqSum += dataArray[q];
 	}
 	return freqSum;
-}
-
-function averageFrequency() {
-	return frequencySum() / dataArray.length;
-}
-
-function componentToHex(c) {
-    var hexa = c.toString(16);
-    return hexa.length == 1 ? "0" + hexa : hexa;
-}
-
-function rgbToHex(r, g, b) {
-    return "0x" + componentToHex(r) + componentToHex(g) + componentToHex(b);
 }
 
 function render()
