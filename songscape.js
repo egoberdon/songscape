@@ -56,7 +56,7 @@ function init()
 	camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
 	scene.add(camera);
 	//camera.position.set(10,150,400);
-	camera.position.set(10,50,cameraZPosition);
+	camera.position.set(10,100,cameraZPosition);
 	camera.lookAt(scene.position);
 	//camera.lookAt(new THREE.Vector3(10,150,4000));
 	// RENDERER
@@ -78,7 +78,7 @@ function init()
 	container.appendChild( stats.domElement );
 
 	light = new THREE.DirectionalLight(0xffffff);
-	light.intensity = 3;
+	light.intensity = 10;
 
 	back_light = new THREE.DirectionalLight(0xffffff); //add a little light behind camera to fake ambient effect
 	back_light.intensity = .25;
@@ -90,7 +90,7 @@ function init()
     new THREE.MeshBasicMaterial( { color: 0xffaa00 } )
   );
 	sun_y = 100;
-  sun.position.set(-200,sun_y, -500);
+  sun.position.set(0,sun_y, -600);
   scene.add(sun);
 	light.position = sun.position; //these are the same
 	scene.add(light);
@@ -139,14 +139,14 @@ function createFaces(){
 		for (var i = 0; i < 6; i++) {
 			// left row
 			faceLeft = new THREE.Mesh(geometry,leftShapeMaterial);
-			faceLeft.position.set(-100, 50, zFacePosition);
-			faceLeft.scale.set(3,3,3);
+			faceLeft.position.set(-100, 45, zFacePosition);
+			faceLeft.scale.set(5,5,5);
 			scene.add(faceLeft);
 			targetList.push(faceLeft); //update score when face is clicked
 			// right row
 			faceRight = new THREE.Mesh(geometry,rightShapeMaterial);
-			faceRight.position.set(100, 50, zFacePosition);
-			faceRight.scale.set(3,3,3);
+			faceRight.position.set(100, 45, zFacePosition);
+			faceRight.scale.set(5,5,5);
 			faceRight.rotateY(180);
 			scene.add(faceRight);
 			targetList.push(faceRight); //update score when face is clicked
@@ -155,7 +155,7 @@ function createFaces(){
 	});
 }
 
-function updateFaces(zFacePosition){
+function updateFaces(zFacePosition){ //the first shall become the last
 		var leftFace = targetList.shift();
 		var rightFace = targetList.shift();
 		leftFace.position.setZ(zFacePosition);
@@ -196,7 +196,7 @@ function createScoreText() {
 
 	textGeom.computeBoundingBox();
 	textWidth = textGeom.boundingBox.max.x - textGeom.boundingBox.min.x;
-	textMesh.position.set(-450, 125, textZ);
+	textMesh.position.set(-400, 150, textZ);
 	textMesh.rotation.x = -Math.PI / 4;
 	scene.add(textMesh);
 }
@@ -212,13 +212,12 @@ function movement(){
 	textZ = cameraZPosition - 600; //to make sure refreshText still works
 	textMesh.position.setZ(textZ);
 	sun.position.setZ(cameraZPosition - 900);
-	//back_light.position.setZ(cameraZPosition + 100);
 	if (cameraZPosition % 150 == 0){
 		updateFaces(cameraZPosition - 950); //950 is 5 * -150 number of rows minus additional 200 as reference to camera position
 	}
 	if (cameraZPosition % 1000 == 0){
-		floor.position.setZ(cameraZPosition - 400);
 		skyBox.position.setZ(cameraZPosition - 500);
+		floor.position.setZ(cameraZPosition - 400);
 	}
 }
 
@@ -269,28 +268,23 @@ function animate()
 }
 
 function update()
-//if sun moves underground or above 1000 it no longer shines
 {
-	if ( keyboard.pressed("up") ) //sun rises, light decreases, max 1,000
+	if ( keyboard.pressed("up") ) //sun rises, max 1,000
 	{
-		sun_y +=5;
 		if (sun_y > 1000){
 			sun_y = 1000;
-			light.intensity = 0;
 		}
-		else{
-			light.intensity = 3;
-			sun.position.setY(sun_y);
-		}
+		sun_y +=5;
+		sun.position.setY(sun_y);
 	}
-	if (keyboard.pressed("down")){ //sun lowers, light increases, max increases
+	if (keyboard.pressed("down")){ //sun lowers, min -15
 		sun_y -=5;
-		if (sun_y < -10){
-			sun_y = -10;
+		if (sun_y < -15){
+			sun_y = -15;
 			light.intensity = 0;
 		}
 		else{
-			light.intensity = 3;
+			light.intensity = 10;
 			sun.position.setY(sun_y);
 		}
 	}
@@ -312,9 +306,9 @@ function update()
 
 			targetList[0].material.color.setHex( hex );
 			targetList[1].material.color.setHex( hex );
-			for (var w = 0; w < targetList.length; w++) {
-				targetList[w].scale.y = (scale < 1 ? 1 : scale);
-			}
+			// for (var w = 0; w < targetList.length; w++) {
+			// 	targetList[w].scale.y = (scale < 1 ? 1 : scale);
+			// }
 		}
 
 		if (gVal >= 255) gUp = false;
