@@ -35,6 +35,9 @@ var cube;
 
 var moving = false;
 
+var val = 50; //starting value of
+var gVal = 0xff0000;
+
 //audio
 
 var ctx = new (window.AudioContext || window.webkitAudioContext)(); //webkitAudioContext is for Safari users; ctx is a container for all sound
@@ -45,7 +48,7 @@ analyser.smoothingTimeConstant = 1;
 var dataArray;
 var boost = 0;
 var time = 0;
-var mp3_location = 'mp3/sample.mp3';
+var mp3_location = 'mp3/sample3.mp3';
 
 init();
 animate();
@@ -267,36 +270,21 @@ function movement(){
 }
 
 function faceColor(){
-	// if (faceCall < 10000){
-	// 	faceCall++;
-	// }
-	// else{
-	// 	faceCall = 0;
-	// }
-	// console.log(faceCall);
 	if(typeof dataArray === 'object' && dataArray.length > 0) {
-		var val = dataArray[0]
-		var gVal;
-		if (val < 100){
-			gVal = .5;
+		var last_val = val; //previous value in dataArray, starting value is defined in global variables
+		val = dataArray[0];
+		if (val > last_val){
+			//gVal+=25;
+			gVal += 0x000019;
+			console.log('increasing color')
 		}
-		else if (val < 128){
-			gVal = .75;
+		else if(val < last_val){
+			gVal -= 0x000019;
+			console.log('decreasing color');
 		}
-		else if (val < 150){
-			gVal = .9;
-		}
-		else if (val < 160){
-			gVal = 1;
-		}
-		// if (targetList[0] != null && targetList[1] != null) {
-		// 	targetList[0].material.color.setRGB(50, gVal, 80);
-		// 	targetList[1].material.color.setRGB(50, gVal, 80);
-		// }
-
 		if (targetList[0] != null && targetList[1] != null) {
-			targetList[0].material.color.setHSL(s=gVal);
-			targetList[1].material.color.setHSL(s=gVal);
+			targetList[0].material.color.setHex(gVal);
+			targetList[1].material.color.setHex(gVal);
 		}
 		//k += (k < dataArray.length ? 1 : 0);
 	}
