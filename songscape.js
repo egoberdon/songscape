@@ -275,15 +275,28 @@ function faceColor(){
 	// }
 	// console.log(faceCall);
 	if(typeof dataArray === 'object' && dataArray.length > 0) {
-		//var k = 0;
-		//var scale = dataArray[k] / 45;
-		//console.log("k", k, "dataArray[k]",dataArray[k]);
-		console.log(dataArray[0]);
-		var gVal = (dataArray[0] * 100) % 255;
-		//console.log(gVal);
+		var val = dataArray[0]
+		var gVal;
+		if (val < 100){
+			gVal = .5;
+		}
+		else if (val < 128){
+			gVal = .75;
+		}
+		else if (val < 150){
+			gVal = .9;
+		}
+		else if (val < 160){
+			gVal = 1;
+		}
+		// if (targetList[0] != null && targetList[1] != null) {
+		// 	targetList[0].material.color.setRGB(50, gVal, 80);
+		// 	targetList[1].material.color.setRGB(50, gVal, 80);
+		// }
+
 		if (targetList[0] != null && targetList[1] != null) {
-			targetList[0].material.color.setRGB(100, gVal, 200);
-			targetList[1].material.color.setRGB(100, gVal, 200);
+			targetList[0].material.color.setHSL(s=gVal);
+			targetList[1].material.color.setHSL(s=gVal);
 		}
 		//k += (k < dataArray.length ? 1 : 0);
 	}
@@ -345,6 +358,7 @@ function update()
 			sun_y = 1000;
 		}
 		sun_y +=5;
+		light.intensity = 10;
 		sun.position.setY(sun_y);
 	}
 	if (keyboard.pressed("down")){ //sun lowers, min -15
