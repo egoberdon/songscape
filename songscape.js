@@ -47,6 +47,12 @@ var bUp = true;
 
 var moving = false;
 
+var intersects; //holds all face objects that the Raycaster intersects with
+
+var sphereGeom, sphere, redMaterial;
+
+var activeLasers = [];
+
 init();
 animate();
 
@@ -59,10 +65,8 @@ function init()
 	var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
 	camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
 	scene.add(camera);
-	//camera.position.set(10,150,400);
 	camera.position.set(10,100,cameraZPosition);
 	camera.lookAt(scene.position);
-	//camera.lookAt(new THREE.Vector3(10,150,4000));
 	// RENDERER
 	if ( Detector.webgl )
 		renderer = new THREE.WebGLRenderer( {antialias:true} );
@@ -89,13 +93,13 @@ function init()
 	back_light.position.set(200,100,500);
 	scene.add(back_light);
 
-  sun = new THREE.Mesh(
-    new THREE.SphereGeometry( 10, 16, 8 ),
-    new THREE.MeshBasicMaterial( { color: 0xffaa00 } )
-  );
+	sun = new THREE.Mesh(
+	    new THREE.SphereGeometry( 10, 16, 8 ),
+	    new THREE.MeshBasicMaterial( { color: 0xffaa00 } )
+	);
 	sun_y = 100;
-  sun.position.set(0,sun_y, -600);
-  scene.add(sun);
+  	sun.position.set(0,sun_y, -600);
+ 	 scene.add(sun);
 	light.position = sun.position; //these are the same
 	scene.add(light);
 
@@ -248,7 +252,7 @@ function refreshAnyText(str) {
 }
 
 function movement(){
-	cameraZPosition = cameraZPosition - 5;
+	cameraZPosition = cameraZPosition - 1;
 	camera.position.setZ(cameraZPosition);
 	textZ = cameraZPosition - 600; //to make sure refreshText still works
 	textMesh.position.setZ(textZ);
@@ -264,37 +268,128 @@ function movement(){
 
 function onDocumentMouseDown( event )
 {
-	// the following line would stop any other event handler from firing
-	// (such as the mouse's TrackballControls)
-	// event.preventDefault();
-
-	console.log("Click.");
-
 	// update the mouse variable
 	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
-	// find intersections
-
 	// create a Ray with origin at the mouse position
 	//   and direction into the scene (camera direction)
 	var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
-	projector.unprojectVector( vector, camera );
+	projector.unprojectVector( vector, camera ); //make sure it works in 3D space
 	var ray = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
 
-	// create an array containing all objects in the scene with which the ray intersects
-	var intersects = ray.intersectObjects( targetList );
+	/*CREATE LASER WHENEVER MOUSE CLICKED*/
+	var newLaser = new Laser(randomColor());
+	newLaser.spawnLaser();
+	newLaser.setID(activeLasers.length); //keep track of position in array so we can remove lasers when necessary
+	newLaser.setRaycaster(ray);
+	activeLasers.push(newLaser); //add newly created laser to array that keeps track of all visible lasers
 
-	// if there is one (or more) intersections
-	if ( intersects.length > 0 )
-	{
+	// create an array containing all objects in the scene with which the ray intersects
+	intersects = ray.intersectObjects( targetList ); //returns an Array of objects the ray intersects with
+
+	// if there is one (or more) intersections, add 1 to score
+	if ( intersects.length > 0 ) {
 		score++;
 		refreshScoreText();
 		checkShowMessageText(); //check whether a message should be shown (messages shown at 5,10,15, and 25 points)
+	}
 
-		// change the color of the closest face.
-		// intersects[ 0 ].face.color.setRGB( 0.8 * Math.random() + 0.2, 0, 0 );
-		// intersects[ 0 ].object.geometry.colorsNeedUpdate = true;
+}
+
+/*
+	LASER OBJECT DEFINITION
+
+	Custom constructor function used to create Laser objects
+	Inspired by:
+		http://www.w3schools.com/js/js_object_prototypes.asp
+		http://javascriptissexy.com/oop-in-javascript-what-you-need-to-know/
+*/
+function Laser(colorHex) {
+
+	//create instance properties; these properties will be unique to every instance of Laser created
+	this.laserColor = colorHex;
+	//this.laserGeometry = new THREE.CylinderGeometry( 1, 1, 50, 20, 4);
+	this.laserGeometry = new THREE.SphereGeometry( 3, 32, 16);
+
+	this.laserMaterial = new THREE.MeshPhongMaterial( { color: this.laserColor } );
+	this.laserMesh = new THREE.Mesh( this.laserGeometry, this.laserMaterial );
+	this.laserID = 0;
+	this.laserXLocation = 10;
+	this.laserYLocation = 100;
+	this.laserZLocation = cameraZPosition;
+	this.raycaster = null;
+	this.projector = new THREE.Projector();
+
+
+	/*
+ 	  Keeps track of how far along ray path a laser is;
+ 	  Used to compute laser location as it flies through space
+	*/
+	this.distanceAlongRay = 0; 
+
+	this.setRaycaster = function(inputRay) {
+		this.raycaster = inputRay;
+	}
+
+	//define methods that will be inherited by all Laser instances
+	this.showColor = function() {
+		return "Laser color: " + this.laserColor;
+	}
+
+	this.setColor = function(newColor) {
+		this.laserColor = newColor;
+	}
+
+	this.spawnLaser = function() {
+		//this.laserMesh.position.set(10, 50, 300);
+		this.laserMesh.position.set(this.laserXLocation, this.laserYLocation, this.laserZLocation);
+console.log("starting ZLocation: " + this.laserZLocation);
+console.log("current cameraZLocation " + cameraZPosition);
+		this.laserMesh.rotation.x = -Math.PI/-2;
+		scene.add(this.laserMesh);
+	}
+
+	/*
+		GETTER AND SETTER FOR ID
+	*/
+	this.setID = function(id) {
+		this.laserID = id;
+	}
+
+	this.getID = function() {
+		return this.laserID;
+	}
+
+	this.updateZLocation = function() {
+		this.laserZLocation -= 5;
+		this.laserMesh.position.set(this.laserXLocation, this.laserYLocation, this.laserZLocation);
+	}
+
+	//get new laser location based on the distance along the ray created when user clicks
+	this.updateLaserLocation = function() {
+		this.distanceAlongRay += 5;
+
+		/*
+			Raycaster has a ray property of type Ray; we need this to use the at(distance) method,
+			which gives us a Vector3 containing the coordinates located distance away from the ray's origin
+		*/
+		this.laserXLocation = this.raycaster.ray.at(this.distanceAlongRay).x;
+		this.laserYLocation = this.raycaster.ray.at(this.distanceAlongRay).y;
+		this.laserZLocation = this.raycaster.ray.at(this.distanceAlongRay).z;
+		this.laserMesh.position.set(this.laserXLocation, this.laserYLocation, this.laserZLocation);
+	}
+
+	this.getXLocation = function() {
+		return this.laserXLocation;
+	}
+
+	this.getYLocation = function() {
+		return this.laserYLocation;
+	}
+
+	this.getZLocation = function() {
+		return this.laserZLocation;
 	}
 
 }
@@ -311,6 +406,33 @@ function animate()
 
 function update()
 {
+
+	//update coordinate position for all currently active lasers
+	for (var i = 0; i < activeLasers.length; i++) {
+		activeLasers[i].updateLaserLocation();
+
+		if ( intersects.length > 0 ) {
+			//remove laser from screen once its z-value becomes less than the face's z-value
+			if ( activeLasers[i].getZLocation() <= intersects[0].object.position.z ) {
+				console.log("activeLasers[i].getXLocation: " + activeLasers[i].getYLocation());
+				console.log("intersects[0].object.position.x: " + intersects[0].point.y);
+				//intersects[0].object.scale.set(7,7,7); //scale faces once "hit" by laser
+				scene.remove(activeLasers[i].laserMesh);
+				activeLasers.splice(i, 1); //remove laser at index i from array
+				console.log("explode, removing hit laser");
+			}
+		}
+		else {
+			//remove "misses" once 1000 units away from the camera on the z-axis
+			if (activeLasers[i].getZLocation() <= cameraZPosition - 1000) {
+				console.log("removing miss laser");
+				scene.remove(activeLasers[i].laserMesh);
+				activeLasers.splice(i, 1); //remove laser at index i from array
+			}
+		}
+
+	}
+
 	if ( keyboard.pressed("up") ) //sun rises, max 1,000
 	{
 		if (sun_y > 1000){
@@ -337,10 +459,9 @@ function update()
 	if (showMessage == true) {
 
 		messageIsShowing = true;
-		//textAnyZ = cameraZPosition - 600;
 		if (myMesh != undefined) {
 			myMesh.position.setZ(textAnyZ); //update z position
-			textAnyZ += 20;
+			textAnyZ += 10;
 		}
 		if (myMesh.position.z >= (cameraZPosition + 20)) {
 			showMessage = false;
@@ -408,6 +529,28 @@ function showAndFade(str) {
  	/*this triggers the if-statement in update() to continuously change z-coordinate value for the 3D Text until it's off the screen, at which point it is removed from the scene*/
 	showMessage = true;
 
+}
+
+/*
+	returns a random color among RED, YELLOW, and BLUE
+*/
+function randomColor() {
+ 	var ranInt = Math.floor((Math.random() * 3) + 1);
+ 	//console.log("ranInt: " + ranInt);
+ 	switch (ranInt) {
+ 		case 1:
+ 			return 0xff0000; //RED
+ 			break;
+ 		case 2:
+ 			return 0xffff00; //YELLOW
+ 			break;
+ 		case 3:
+ 			return 0x0000ff; //BLUE
+ 			break;
+ 		default:
+ 			return 0xff0000; //RED (default shouldn't ever execute)
+ 			break;
+ 	}
 }
 
 function frequencySum() {
