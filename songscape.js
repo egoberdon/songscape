@@ -7,6 +7,7 @@ var clock = new THREE.Clock();
 var parameters;
 var gui;
 var faceCall = 0;
+
 //face models
 var loader = new THREE.JSONLoader(); // init the loader util
 var face = eli = 'obj/finalFace.json'; //normal eli face
@@ -46,7 +47,7 @@ var sphereGeom, sphere, redMaterial;
 
 var activeLasers = [];
 
-var val = 50; //starting value of
+var val = 50; //starting value for face changing
 var gVal = 0xff0000;
 
 //audio
