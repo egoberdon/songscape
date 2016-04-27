@@ -11,7 +11,7 @@ var gui;
 var loader = new THREE.JSONLoader(); // init the loader util
 var face = eli = 'obj/finalFace.json'; //normal eli face
 var steve = 'obj/steve.json'; //alternate face for steve mode
-var steve_mode = true; //steve mode boolean flag
+var steve_mode = false; //steve mode boolean flag
 
 //lighting
 var sun, sun_y;
