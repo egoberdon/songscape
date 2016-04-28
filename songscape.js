@@ -241,9 +241,9 @@ function createGUI() {
 
 	var parameters =
 	{
-		c: "" // start with empty String in text box
+		c: "", // start with empty String in text box
+		selector: "Song 1"
 	};
-
 	gui.add( parameters, 'c' ).name('cheat codes').onChange(function(newValue)
 	{
 		//change faces to Steve faces
@@ -264,6 +264,10 @@ function createGUI() {
 			refreshScoreText();
 		}
 	});
+	gui.add( parameters, 'selector', [ "Song 1", "Song 2", "Song 3", "Song 4" ]).name('select song').onChange(function(newValue))
+	{
+
+	}
 	gui.open();
 }
 
