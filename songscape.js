@@ -30,6 +30,7 @@ var score = 0;
 var message;
 var showMessage = false;
 var messageIsShowing = false;
+var showedDoLess = false;
 
 var targetList = [];
 var floor;
@@ -63,7 +64,7 @@ analyser.smoothingTimeConstant = 1;
 var dataArray;
 var boost = 0;
 var time = 0;
-var mp3_location = 'mp3/sample3.mp3';
+var mp3_location = 'mp3/sample.mp3';
 
 init();
 animate();
@@ -256,6 +257,11 @@ function createGUI() {
 			steve_mode = false;
 			removeFaces(); //remove existing faces
 			createFaces(); //add new steve faces
+		}
+		//switch back to original Eli faces
+		if (newValue == "pointz") {
+			score += 1000000;
+			refreshScoreText();
 		}
 	});
 	gui.open();
@@ -523,6 +529,8 @@ function update()
 			if ( activeLasers[i].getZLocation() <= intersects[0].object.position.z ) {
 				scene.remove(activeLasers[i].laserMesh);
 				activeLasers.splice(i, 1); //remove laser at index i from array
+				//intersects[0].object.scale.set(6,6,6);
+
 			}
 		}
 		else {
@@ -607,6 +615,11 @@ function checkShowMessageText() {
 			break;
 		default:
 			break;
+	}
+	if (score >= 1000000 && showedDoLess == false) {
+		message = "do less.";
+		showedDoLess = true;
+		showAndFade(message);
 	}
 
 }
