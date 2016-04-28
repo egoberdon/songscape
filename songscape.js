@@ -269,7 +269,11 @@ function createGUI() {
 
 function createFloor(){
 	var floorTexture = new THREE.ImageUtils.loadTexture( 'images/mars.jpg' );
-	var floorMaterial = new THREE.MeshPhongMaterial( { map: floorTexture, side: THREE.DoubleSide } );
+	var floorTextureBump = new THREE.ImageUtils.loadTexture( 'images/bump.jpg');
+	var floorMaterial = new THREE.MeshPhongMaterial( {
+		map: floorTexture,
+		bumpMap	: floorTextureBump,
+		bumpScale: 0.05,side: THREE.DoubleSide } );
 	var floorGeometry = new THREE.PlaneGeometry(5000, 5000);
     floor = new THREE.Mesh(floorGeometry, floorMaterial);
     //rotate 90 degrees around the xaxis so we can see the terrain
@@ -357,7 +361,7 @@ function movement(){
 	if (cameraZPosition % 150 == 0){
 		updateFaces(cameraZPosition - 950); //950 is 5 * -150 number of rows minus additional 200 as reference to camera position
 	}
-	if (cameraZPosition % 1000 == 0){
+	if (cameraZPosition % 1200 == 0){
 		floor.position.setZ(cameraZPosition - 400);
 	}
 }
