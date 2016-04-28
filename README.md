@@ -7,6 +7,10 @@ Built by dreamers for dreamers
 Load up songscape.html in a browser to start the fun!
 Gain points with different point values to unlock different parts of the experience.
 
+##Runtime Environment
+
+Tested on Chrome
+
 ##Points
 + 5 Points - Song begins
 + 15 Points - Music starts
