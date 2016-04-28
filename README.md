@@ -1,16 +1,34 @@
-# songscape.js
+#songscape.js
 
 Built by dreamers for dreamers
 
-##songscape.js
+##songscape.html
 
-songscape.js is the main part of the program
-the current songscape.js is a row of faces(red and yellow) arrow keys up and down move a sun (and directional light) to change the mood of the scene
+Load up songscape.html in a browser to start the fun!
+Gain points with different point values to unlock different parts of the experience.
+
+##Points
++ 5 Points - Song begins
++ 15 Points - Music starts
++ 25 Points - Movement starts
++ 30 Points - Faces implode
+
+##GUI
++ cheat codes: type in cheat codes for surprises
++ song selector: select one of four sample songs
++ custom: load a custom song from your local directory
++ *NOTE* for song selector & custom, you must choose your song before it starts playing! songs will not change midway through to maintain the aesthetic
 
 ##User Controls
 
-+ 'S' starts automatic movement in scene
 + arrow key up makes sun/light move up
 + arrow key down makes sun/light move down
-+ x stops music
-+ Mouse Click on face -> 1 point  
++ Mouse Click
+  + on face - increases points by one
+  + anywhere (including face) - generates a laser
+
+##Commented Out Controls (Useful For Testing)
++ m - toggles movement
++ s - stops song
++ p - plays song *NOTE* songs cannot be restarted once there stopped in the WebAudioAPI
++ c - toggles color

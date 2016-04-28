@@ -64,7 +64,7 @@ analyser.smoothingTimeConstant = 1;
 var dataArray;
 var boost = 0;
 var time = 0;
-var mp3_location = 'mp3/sample.mp3';
+var mp3_location = 'mp3/sample0.mp3';
 
 init();
 animate();
@@ -97,12 +97,12 @@ function init()
 	stats.domElement.style.zIndex = 100;
 	container.appendChild( stats.domElement );
 
-	light = new THREE.DirectionalLight(0xffffff);
-	light.intensity = 10;
+	light = new THREE.PointLight(0xffffff);
+	light.intensity = 2;
 
-	back_light = new THREE.DirectionalLight(0xffffff); //add a little light behind camera to fake ambient effect
-	back_light.intensity = .25;
-	back_light.position.set(200,100,500);
+	back_light = new THREE.PointLight(0xffffff); //add a little light behind camera to fake ambient effect
+	back_light.intensity = .5;
+	back_light.position.set(0,100,500);
 	scene.add(back_light);
 
 	sun = new THREE.Mesh(
@@ -110,8 +110,8 @@ function init()
 	    new THREE.MeshBasicMaterial( { color: 0xffaa00 } )
 	);
 	sun_y = 100;
-  	sun.position.set(0,sun_y, -600);
- 	 scene.add(sun);
+  sun.position.set(0,sun_y, -600);
+ 	scene.add(sun);
 	light.position = sun.position; //these are the same
 	scene.add(light);
 
@@ -162,10 +162,6 @@ function play() {
     //play immediately
     src.start();
     playing = true;
-}
-
-function stop(){
-  src.stop();
 }
 
 function createSky(){
@@ -238,12 +234,11 @@ function updateFaces(zFacePosition){ //the first shall become the last
 
 function createGUI() {
 	var gui = new dat.GUI();
-	
-	var parameters = 
-	{
-		c: "" // start with empty String in text box
+	parameters = {
+		c: "", // start with empty String in text box
+		selector: "sample0",
+		custom: "",
 	};
-
 	gui.add( parameters, 'c' ).name('cheat codes').onChange(function(newValue)
 	{
 		//change faces to Steve faces
@@ -258,18 +253,30 @@ function createGUI() {
 			removeFaces(); //remove existing faces
 			createFaces(); //add new steve faces
 		}
-		//switch back to original Eli faces
+		//get a million points
 		if (newValue == "pointz") {
 			score += 1000000;
 			refreshScoreText();
 		}
+	});
+	gui.add( parameters, 'selector', [0,1,2,3]).name('select song').onChange(function(newValue)
+	{
+		mp3_location = "mp3/sample" + newValue + ".mp3";
+	});
+	gui.add( parameters, 'custom' ).name('custom track').onChange(function(newValue)
+	{
+		mp3_location = newValue;
 	});
 	gui.open();
 }
 
 function createFloor(){
 	var floorTexture = new THREE.ImageUtils.loadTexture( 'images/mars.jpg' );
-	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
+	var floorTextureBump = new THREE.ImageUtils.loadTexture( 'images/bump.jpg');
+	var floorMaterial = new THREE.MeshPhongMaterial( {
+		map: floorTexture,
+		bumpMap	: floorTextureBump,
+		bumpScale: 0.05,side: THREE.DoubleSide } );
 	var floorGeometry = new THREE.PlaneGeometry(5000, 5000);
     floor = new THREE.Mesh(floorGeometry, floorMaterial);
     //rotate 90 degrees around the xaxis so we can see the terrain
@@ -352,11 +359,12 @@ function movement(){
 	textZ = cameraZPosition - 600; //to make sure refreshText still works
 	textMesh.position.setZ(textZ);
 	sun.position.setZ(cameraZPosition - 900);
+	skyBox.position.setZ(cameraZPosition - 500);
+	back_light.position.setZ(cameraZPosition + 100);
 	if (cameraZPosition % 150 == 0){
 		updateFaces(cameraZPosition - 950); //950 is 5 * -150 number of rows minus additional 200 as reference to camera position
 	}
-	if (cameraZPosition % 1000 == 0){
-		skyBox.position.setZ(cameraZPosition - 500);
+	if (cameraZPosition % 1200 == 0){
 		floor.position.setZ(cameraZPosition - 400);
 	}
 }
@@ -543,28 +551,40 @@ function update()
 
 	}
 
+	/* These are useful for testing but shouldn't work in the normal game
+	if ( keyboard.pressed("m") ){
+		moving = (! moving);
+	}
+	if ( keyboard.pressed("p") ){
+		loadFile();
+	}
+	if ( keyboard.pressed("s") ){
+		src.stop();
+	}
+	if ( keyboard.pressed("c") ){
+		color = (! color);
+	}
+	*/
+
 	if ( keyboard.pressed("up") ) //sun rises, max 1,000
 	{
+		sun_y +=5;
+		light.intensity = 1;
 		if (sun_y > 1000){
 			sun_y = 1000;
 		}
-		sun_y +=5;
-		light.intensity = 10;
 		sun.position.setY(sun_y);
 	}
 	if (keyboard.pressed("down")){ //sun lowers, min -15
 		sun_y -=5;
+		light.intensity = 1;
 		if (sun_y < -15){
 			sun_y = -15;
 			light.intensity = 0;
 		}
-		else{
-			light.intensity = 10;
-			sun.position.setY(sun_y);
-		}
+		sun.position.setY(sun_y);
 	}
 	if (showMessage == true) {
-
 		messageIsShowing = true;
 		if (myMesh != undefined) {
 			myMesh.position.setZ(textAnyZ); //update z position
