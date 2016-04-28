@@ -102,7 +102,7 @@ function init()
 
 	back_light = new THREE.DirectionalLight(0xffffff); //add a little light behind camera to fake ambient effect
 	back_light.intensity = .25;
-	back_light.position.set(200,100,500);
+	back_light.position.set(0,100,500);
 	scene.add(back_light);
 
 	sun = new THREE.Mesh(
@@ -110,10 +110,10 @@ function init()
 	    new THREE.MeshBasicMaterial( { color: 0xffaa00 } )
 	);
 	sun_y = 100;
-  	sun.position.set(0,sun_y, -600);
- 	 scene.add(sun);
+  sun.position.set(0,sun_y, -600);
+ 	scene.add(sun);
 	light.position = sun.position; //these are the same
-	scene.add(light);
+	//scene.add(light);
 
 	createSky();
 	createScoreText();
@@ -258,7 +258,7 @@ function createGUI() {
 			removeFaces(); //remove existing faces
 			createFaces(); //add new steve faces
 		}
-		//switch back to original Eli faces
+		//get a million points
 		if (newValue == "pointz") {
 			score += 1000000;
 			refreshScoreText();
@@ -353,6 +353,11 @@ function movement(){
 	textMesh.position.setZ(textZ);
 	sun.position.setZ(cameraZPosition - 900);
 	skyBox.position.setZ(cameraZPosition - 500);
+	back_light.position.setZ(cameraZPosition + 100);
+	console.log('camera position', camera.position.z);
+	console.log('sun position', sun.position.z);
+	console.log('light position (should be same as above)', light.position.z);
+	console.log('back_light position', back_light.position.z);
 	if (cameraZPosition % 150 == 0){
 		updateFaces(cameraZPosition - 950); //950 is 5 * -150 number of rows minus additional 200 as reference to camera position
 	}
@@ -547,10 +552,10 @@ function update()
 	}
 	if ( keyboard.pressed("up") ) //sun rises, max 1,000
 	{
+		sun_y +=5;
 		if (sun_y > 1000){
 			sun_y = 1000;
 		}
-		sun_y +=5;
 		light.intensity = 10;
 		sun.position.setY(sun_y);
 	}
