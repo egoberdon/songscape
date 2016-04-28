@@ -352,11 +352,11 @@ function movement(){
 	textZ = cameraZPosition - 600; //to make sure refreshText still works
 	textMesh.position.setZ(textZ);
 	sun.position.setZ(cameraZPosition - 900);
+	skyBox.position.setZ(cameraZPosition - 500);
 	if (cameraZPosition % 150 == 0){
 		updateFaces(cameraZPosition - 950); //950 is 5 * -150 number of rows minus additional 200 as reference to camera position
 	}
 	if (cameraZPosition % 1000 == 0){
-		skyBox.position.setZ(cameraZPosition - 500);
 		floor.position.setZ(cameraZPosition - 400);
 	}
 }
