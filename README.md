@@ -17,7 +17,7 @@ Gain points with different point values to unlock different parts of the experie
 + cheat codes: type in cheat codes for surprises
 + song selector: select one of four sample songs
 + custom: load a custom song from your local directory
-+ *NOTE* for song selector & custom, you must choose your song before it starts playing! songs will not change midway through to maintain the aesthetic
++ **NOTE** for song selector & custom, you must choose your song before it starts playing! songs will not change midway through to maintain the aesthetic
 
 ##User Controls
 
@@ -30,5 +30,5 @@ Gain points with different point values to unlock different parts of the experie
 ##Commented Out Controls (Useful For Testing)
 + m - toggles movement
 + s - stops song
-+ p - plays song *NOTE* songs cannot be restarted once there stopped in the WebAudioAPI
++ p - plays song **NOTE** songs cannot be restarted once they're stopped in the WebAudioAPI
 + c - toggles color
