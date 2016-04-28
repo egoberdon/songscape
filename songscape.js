@@ -97,11 +97,11 @@ function init()
 	stats.domElement.style.zIndex = 100;
 	container.appendChild( stats.domElement );
 
-	light = new THREE.DirectionalLight(0xffffff);
-	light.intensity = 10;
+	light = new THREE.PointLight(0xffffff);
+	light.intensity = 2;
 
-	back_light = new THREE.DirectionalLight(0xffffff); //add a little light behind camera to fake ambient effect
-	back_light.intensity = .25;
+	back_light = new THREE.PointLight(0xffffff); //add a little light behind camera to fake ambient effect
+	back_light.intensity = .5;
 	back_light.position.set(0,100,500);
 	scene.add(back_light);
 
@@ -113,7 +113,7 @@ function init()
   sun.position.set(0,sun_y, -600);
  	scene.add(sun);
 	light.position = sun.position; //these are the same
-	//scene.add(light);
+	scene.add(light);
 
 	createSky();
 	createScoreText();
@@ -354,10 +354,6 @@ function movement(){
 	sun.position.setZ(cameraZPosition - 900);
 	skyBox.position.setZ(cameraZPosition - 500);
 	back_light.position.setZ(cameraZPosition + 100);
-	console.log('camera position', camera.position.z);
-	console.log('sun position', sun.position.z);
-	console.log('light position (should be same as above)', light.position.z);
-	console.log('back_light position', back_light.position.z);
 	if (cameraZPosition % 150 == 0){
 		updateFaces(cameraZPosition - 950); //950 is 5 * -150 number of rows minus additional 200 as reference to camera position
 	}
@@ -553,25 +549,22 @@ function update()
 	if ( keyboard.pressed("up") ) //sun rises, max 1,000
 	{
 		sun_y +=5;
+		light.intensity = 1;
 		if (sun_y > 1000){
 			sun_y = 1000;
 		}
-		light.intensity = 10;
 		sun.position.setY(sun_y);
 	}
 	if (keyboard.pressed("down")){ //sun lowers, min -15
 		sun_y -=5;
+		light.intensity = 1;
 		if (sun_y < -15){
 			sun_y = -15;
 			light.intensity = 0;
 		}
-		else{
-			light.intensity = 10;
-			sun.position.setY(sun_y);
-		}
+		sun.position.setY(sun_y);
 	}
 	if (showMessage == true) {
-
 		messageIsShowing = true;
 		if (myMesh != undefined) {
 			myMesh.position.setZ(textAnyZ); //update z position
