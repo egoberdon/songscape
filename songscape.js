@@ -64,7 +64,7 @@ analyser.smoothingTimeConstant = 1;
 var dataArray;
 var boost = 0;
 var time = 0;
-var mp3_location = 'mp3/sample.mp3';
+var mp3_location = 'mp3/sample0.mp3';
 
 init();
 animate();
@@ -237,12 +237,16 @@ function updateFaces(zFacePosition){ //the first shall become the last
 }
 
 function createGUI() {
+	var songPrefix = "mp3/sample";
+	var songArray = [];
+	for (var i = 0; i < 4; i++){
+		songArray.push(songPrefix + i + ".mp3");
+	}
 	var gui = new dat.GUI();
-
-	var parameters =
-	{
+	parameters = {
 		c: "", // start with empty String in text box
-		selector: "Song 1"
+		selector: "sample0",
+		custom: "",
 	};
 	gui.add( parameters, 'c' ).name('cheat codes').onChange(function(newValue)
 	{
@@ -264,10 +268,14 @@ function createGUI() {
 			refreshScoreText();
 		}
 	});
-	gui.add( parameters, 'selector', [ "Song 1", "Song 2", "Song 3", "Song 4" ]).name('select song').onChange(function(newValue))
+	gui.add( parameters, 'selector', songArray).name('select song').onChange(function(newValue)
 	{
-
-	}
+		mp3_location = newValue;
+	});
+	gui.add( parameters, 'custom' ).name('custom track').onChange(function(newValue)
+	{
+		mp3_location = newValue;
+	});
 	gui.open();
 }
 
