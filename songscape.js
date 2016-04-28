@@ -238,8 +238,8 @@ function updateFaces(zFacePosition){ //the first shall become the last
 
 function createGUI() {
 	var gui = new dat.GUI();
-	
-	var parameters = 
+
+	var parameters =
 	{
 		c: "" // start with empty String in text box
 	};
@@ -542,7 +542,9 @@ function update()
 		}
 
 	}
-
+	if ( keyboard.pressed("s") ){
+		moving = (! moving);
+	}
 	if ( keyboard.pressed("up") ) //sun rises, max 1,000
 	{
 		if (sun_y > 1000){
