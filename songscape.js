@@ -38,8 +38,10 @@ var projector, mouse = { x: 0, y: 0 };
 var cameraZPosition = 400;
 var cameraYPosition = 150;
 
-
+//booleans
 var moving = false;
+var color = false;
+
 
 var intersects; //holds all face objects that the Raycaster intersects with
 
@@ -191,8 +193,8 @@ function createFaces(){
 		// ROWS OF FACES
 		var faceLeft;
 		var faceRight;
-		var leftShapeMaterial = new THREE.MeshPhongMaterial( { color:0xff0000, transparent:true, opacity:1, ambient:0xff0000 } );
-		var rightShapeMaterial = new THREE.MeshPhongMaterial( { color:0xfff000, transparent:true, opacity:1, ambient:0xfff000 } );
+		var leftShapeMaterial = new THREE.MeshPhongMaterial( { color:0xffffff, transparent:true, opacity:1, ambient:0xff0000 } );
+		var rightShapeMaterial = new THREE.MeshPhongMaterial( { color:0xffffff, transparent:true, opacity:1, ambient:0xfff000 } );
 		var zFacePosition = 200; // starting z-coordinate for faces
 		for (var i = 0; i < 6; i++) {
 			// left row
@@ -471,8 +473,10 @@ function animate()
 	if (moving){
 		movement()
 	}
+	if (color){
+		faceColor();
+	}
 	analyser.getByteTimeDomainData(dataArray); //grab the time domain data and copy it into our array
-	faceColor();
 	render();
 	update();
 }
@@ -555,6 +559,9 @@ function update()
 	if (keyboard.pressed("x")){
 		stop();
 		console.log("nixxed the music");
+	}
+	if (keyboard.pressed("c")){
+		color = true;
 	}
 	stats.update();
 }
