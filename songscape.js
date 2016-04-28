@@ -118,7 +118,6 @@ function init()
 	createScoreText();
 	createFloor();
 	createFaces();
-	loadFile();
 
 	// when the mouse moves, call the given function
 	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
@@ -165,7 +164,6 @@ function play() {
 
 function stop(){
   src.stop();
-  console.log("it's over!");
 }
 
 function createSky(){
@@ -225,9 +223,9 @@ function updateFaces(zFacePosition){ //the first shall become the last
 }
 
 function createFloor(){
-		var floorTexture = new THREE.ImageUtils.loadTexture( 'images/mars.jpg' );
-		var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
-		var floorGeometry = new THREE.PlaneGeometry(5000, 5000);
+	var floorTexture = new THREE.ImageUtils.loadTexture( 'images/mars.jpg' );
+	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
+	var floorGeometry = new THREE.PlaneGeometry(5000, 5000);
     floor = new THREE.Mesh(floorGeometry, floorMaterial);
     //rotate 90 degrees around the xaxis so we can see the terrain
     floor.rotation.x = -Math.PI/-2;
@@ -323,13 +321,12 @@ function faceColor(){
 		var last_val = val; //previous value in dataArray, starting value is defined in global variables
 		val = dataArray[0];
 		if (val > last_val){
-			//gVal+=25;
 			gVal += 0x000019;
-			console.log('increasing color')
+			//console.log('increasing color')
 		}
 		else if(val < last_val){
 			gVal -= 0x000019;
-			console.log('decreasing color');
+			//console.log('decreasing color');
 		}
 		if (targetList[0] != null && targetList[1] != null) {
 			targetList[0].material.color.setHex(gVal);
@@ -415,10 +412,7 @@ function Laser(colorHex) {
 	}
 
 	this.spawnLaser = function() {
-		//this.laserMesh.position.set(10, 50, 300);
 		this.laserMesh.position.set(this.laserXLocation, this.laserYLocation, this.laserZLocation);
-console.log("starting ZLocation: " + this.laserZLocation);
-console.log("current cameraZLocation " + cameraZPosition);
 		this.laserMesh.rotation.x = -Math.PI/-2;
 		scene.add(this.laserMesh);
 	}
@@ -489,20 +483,17 @@ function update()
 		activeLasers[i].updateLaserLocation();
 
 		if ( intersects.length > 0 ) {
-			//remove laser from screen once its z-value becomes less than the face's z-value
+			//remove "hit" laser from screen once its z-value becomes less than the face's z-value
 			if ( activeLasers[i].getZLocation() <= intersects[0].object.position.z ) {
-				console.log("activeLasers[i].getXLocation: " + activeLasers[i].getYLocation());
-				console.log("intersects[0].object.position.x: " + intersects[0].point.y);
-				//intersects[0].object.scale.set(7,7,7); //scale faces once "hit" by laser
 				scene.remove(activeLasers[i].laserMesh);
 				activeLasers.splice(i, 1); //remove laser at index i from array
-				console.log("explode, removing hit laser");
+				//console.log("explode, removing hit laser");
 			}
 		}
 		else {
 			//remove "misses" once 1000 units away from the camera on the z-axis
 			if (activeLasers[i].getZLocation() <= cameraZPosition - 1000) {
-				console.log("removing miss laser");
+				//console.log("removing miss laser");
 				scene.remove(activeLasers[i].laserMesh);
 				activeLasers.splice(i, 1); //remove laser at index i from array
 			}
@@ -530,10 +521,6 @@ function update()
 			sun.position.setY(sun_y);
 		}
 	}
-	//s toggles movement
-	if (keyboard.pressed("S")){
-		moving = ! moving;
-	}
 
 	if (showMessage == true) {
 
@@ -558,7 +545,7 @@ function update()
 	}
 	if (keyboard.pressed("x")){
 		stop();
-		console.log("nixxed the music");
+		//console.log("nixxed the music");
 	}
 	if (keyboard.pressed("c")){
 		color = true;
@@ -571,6 +558,7 @@ function checkShowMessageText() {
 		case 5:
 			message = "queue the music";
 			showAndFade(message);
+			loadFile();
 			break;
 		case 15:
 			message = "a world of color";
@@ -579,6 +567,7 @@ function checkShowMessageText() {
 		case 25:
 			message = "engines: engaged";
 			showAndFade(message);
+			moving = ! moving;
 			break;
 		case 35:
 			message = "BOOM!";
