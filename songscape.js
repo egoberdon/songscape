@@ -164,10 +164,6 @@ function play() {
     playing = true;
 }
 
-function stop(){
-  src.stop();
-}
-
 function createSky(){
 	//CODE FROM Stemkoski Skybox.html; TODO: customize with own sky images/textures
 	var imagePrefix = "images/space-";
@@ -237,11 +233,6 @@ function updateFaces(zFacePosition){ //the first shall become the last
 }
 
 function createGUI() {
-	var songPrefix = "mp3/sample";
-	var songArray = [];
-	for (var i = 0; i < 4; i++){
-		songArray.push(songPrefix + i + ".mp3");
-	}
 	var gui = new dat.GUI();
 	parameters = {
 		c: "", // start with empty String in text box
@@ -268,9 +259,9 @@ function createGUI() {
 			refreshScoreText();
 		}
 	});
-	gui.add( parameters, 'selector', songArray).name('select song').onChange(function(newValue)
+	gui.add( parameters, 'selector', [0,1,2,3]).name('select song').onChange(function(newValue)
 	{
-		mp3_location = newValue;
+		mp3_location = "mp3/sample" + newValue + ".mp3";
 	});
 	gui.add( parameters, 'custom' ).name('custom track').onChange(function(newValue)
 	{
@@ -559,9 +550,22 @@ function update()
 		}
 
 	}
-	if ( keyboard.pressed("s") ){
+
+	/* These are useful for testing but shouldn't work in the normal game
+	if ( keyboard.pressed("m") ){
 		moving = (! moving);
 	}
+	if ( keyboard.pressed("p") ){
+		loadFile();
+	}
+	if ( keyboard.pressed("s") ){
+		src.stop();
+	}
+	if ( keyboard.pressed("c") ){
+		color = (! color);
+	}
+	*/
+
 	if ( keyboard.pressed("up") ) //sun rises, max 1,000
 	{
 		sun_y +=5;
