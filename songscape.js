@@ -40,6 +40,7 @@ var cameraYPosition = 150;
 
 //booleans
 var moving = false;
+var startMovement = false;
 var color = false;
 
 
@@ -541,14 +542,12 @@ function update()
 			scene.remove(myMesh);
 			messageIsShowing = false;
 			//textAnyZ = cameraZPosition - 600;
+			//this is to make sure movement does not start until "engines: engaged" message is off the screen, thus prevent lag
+			if (startMovement == true) {
+				startMovement = false; //we only want this to trigger once
+				moving = ! moving; //start moving
+			}
 		}
-	}
-	if (keyboard.pressed("x")){
-		stop();
-		//console.log("nixxed the music");
-	}
-	if (keyboard.pressed("c")){
-		color = true;
 	}
 	stats.update();
 }
@@ -563,11 +562,12 @@ function checkShowMessageText() {
 		case 15:
 			message = "a world of color";
 			showAndFade(message);
+			color = true;
 			break;
 		case 25:
 			message = "engines: engaged";
 			showAndFade(message);
-			moving = ! moving;
+			startMovement = true;
 			break;
 		case 35:
 			message = "BOOM!";
@@ -608,14 +608,6 @@ function randomColor() {
  			return 0xff0000; //RED (default shouldn't ever execute)
  			break;
  	}
-}
-
-function frequencySum() {
-	var freqSum = 0;
-	for (var q = 0; q < dataArray.length; q++) {
-		freqSum += dataArray[q];
-	}
-	return freqSum;
 }
 
 function render()
