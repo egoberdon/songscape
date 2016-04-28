@@ -304,7 +304,7 @@ function refreshAnyText(str) {
 }
 
 function movement(){
-	cameraZPosition = cameraZPosition - 1;
+	cameraZPosition = cameraZPosition - 5;
 	camera.position.setZ(cameraZPosition);
 	textZ = cameraZPosition - 600; //to make sure refreshText still works
 	textMesh.position.setZ(textZ);
