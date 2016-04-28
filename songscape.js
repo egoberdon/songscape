@@ -40,6 +40,7 @@ var cameraYPosition = 150;
 
 //booleans
 var moving = false;
+var startMovement = false;
 var color = false;
 
 
@@ -88,7 +89,6 @@ function init()
 	container.appendChild( renderer.domElement );
 	// EVENTS
 	THREEx.WindowResize(renderer, camera);
-	THREEx.FullScreen.bindKey({ charCode : 'm'.charCodeAt(0) });
 	// STATS
 	stats = new Stats();
 	stats.domElement.style.position = 'absolute';
@@ -118,6 +118,7 @@ function init()
 	createScoreText();
 	createFloor();
 	createFaces();
+	createGUI();
 
 	// when the mouse moves, call the given function
 	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
@@ -187,6 +188,9 @@ function createFaces(){
 	if (steve_mode){
 		face = steve;
 	}
+	else {
+		face = eli;
+	}
 	loader.load(face, function (geometry) {
 		// ROWS OF FACES
 		var faceLeft;
@@ -213,13 +217,48 @@ function createFaces(){
 	});
 }
 
+function removeFaces() {
+	var currFace;
+	for (var i = 0; i < targetList.length; i++) {
+		currFace = targetList[i];
+		scene.remove(currFace);
+	}
+	targetList = [];
+}
+
 function updateFaces(zFacePosition){ //the first shall become the last
-		var leftFace = targetList.shift();
-		var rightFace = targetList.shift();
+		var leftFace = targetList.shift(); //remove and return first face in array
+		var rightFace = targetList.shift(); //remove and return first (previously second) face in array
 		leftFace.position.setZ(zFacePosition);
 		rightFace.position.setZ(zFacePosition);
-		targetList.push(leftFace);
+		targetList.push(leftFace); //add face with new z-position to end of array
 		targetList.push(rightFace);
+}
+
+function createGUI() {
+	var gui = new dat.GUI();
+	
+	var parameters = 
+	{
+		c: "" // start with empty String in text box
+	};
+
+	gui.add( parameters, 'c' ).name('cheat codes').onChange(function(newValue)
+	{
+		//change faces to Steve faces
+		if (steve_mode == false && newValue == "stevemode") {
+			steve_mode = true;
+			removeFaces(); //remove existing faces
+			createFaces(); //add new steve faces
+		}
+		//switch back to original Eli faces
+		if (steve_mode == true && newValue == "elimode") {
+			steve_mode = false;
+			removeFaces(); //remove existing faces
+			createFaces(); //add new steve faces
+		}
+	});
+	gui.open();
 }
 
 function createFloor(){
@@ -322,17 +361,14 @@ function faceColor(){
 		val = dataArray[0];
 		if (val > last_val){
 			gVal += 0x000019;
-			//console.log('increasing color')
 		}
 		else if(val < last_val){
 			gVal -= 0x000019;
-			//console.log('decreasing color');
 		}
 		if (targetList[0] != null && targetList[1] != null) {
 			targetList[0].material.color.setHex(gVal);
 			targetList[1].material.color.setHex(gVal);
 		}
-		//k += (k < dataArray.length ? 1 : 0);
 	}
 }
 
@@ -487,13 +523,11 @@ function update()
 			if ( activeLasers[i].getZLocation() <= intersects[0].object.position.z ) {
 				scene.remove(activeLasers[i].laserMesh);
 				activeLasers.splice(i, 1); //remove laser at index i from array
-				//console.log("explode, removing hit laser");
 			}
 		}
 		else {
 			//remove "misses" once 1000 units away from the camera on the z-axis
 			if (activeLasers[i].getZLocation() <= cameraZPosition - 1000) {
-				//console.log("removing miss laser");
 				scene.remove(activeLasers[i].laserMesh);
 				activeLasers.splice(i, 1); //remove laser at index i from array
 			}
@@ -521,7 +555,6 @@ function update()
 			sun.position.setY(sun_y);
 		}
 	}
-
 	if (showMessage == true) {
 
 		messageIsShowing = true;
@@ -541,14 +574,12 @@ function update()
 			scene.remove(myMesh);
 			messageIsShowing = false;
 			//textAnyZ = cameraZPosition - 600;
+			//this is to make sure movement does not start until "engines: engaged" message is off the screen, thus prevent lag
+			if (startMovement == true) {
+				startMovement = false; //we only want this to trigger once
+				moving = ! moving; //start moving
+			}
 		}
-	}
-	if (keyboard.pressed("x")){
-		stop();
-		//console.log("nixxed the music");
-	}
-	if (keyboard.pressed("c")){
-		color = true;
 	}
 	stats.update();
 }
@@ -563,11 +594,12 @@ function checkShowMessageText() {
 		case 15:
 			message = "a world of color";
 			showAndFade(message);
+			color = true;
 			break;
 		case 25:
 			message = "engines: engaged";
 			showAndFade(message);
-			moving = ! moving;
+			startMovement = true;
 			break;
 		case 35:
 			message = "BOOM!";
@@ -593,7 +625,6 @@ function showAndFade(str) {
 */
 function randomColor() {
  	var ranInt = Math.floor((Math.random() * 3) + 1);
- 	//console.log("ranInt: " + ranInt);
  	switch (ranInt) {
  		case 1:
  			return 0xff0000; //RED
@@ -608,14 +639,6 @@ function randomColor() {
  			return 0xff0000; //RED (default shouldn't ever execute)
  			break;
  	}
-}
-
-function frequencySum() {
-	var freqSum = 0;
-	for (var q = 0; q < dataArray.length; q++) {
-		freqSum += dataArray[q];
-	}
-	return freqSum;
 }
 
 function render()
