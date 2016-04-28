@@ -64,7 +64,7 @@ analyser.smoothingTimeConstant = 1;
 var dataArray;
 var boost = 0;
 var time = 0;
-var mp3_location = 'mp3/sample3.mp3';
+var mp3_location = 'mp3/sample.mp3';
 
 init();
 animate();
