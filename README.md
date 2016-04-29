@@ -13,9 +13,9 @@ Tested on Chrome
 
 ##Points
 + 5 Points - Song begins
-+ 15 Points - Music starts
-+ 25 Points - Movement starts
-+ 30 Points - Faces implode
++ 35 Points - Music starts
++ 65 Points - Movement starts
++ 100 Points - Faces implode
 
 ##GUI
 + cheat codes: type in cheat codes for surprises
