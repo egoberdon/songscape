@@ -31,11 +31,6 @@ var message;
 var showMessage = false;
 var messageIsShowing = false;
 var showedDoLess = false;
-var particlesOn = false;
-var fadeToWhite = false;
-var didExecute = false;
-var secondsPassed = 0;
-var elapsed, currOpacity;
 
 var targetList = [];
 var floor;
@@ -48,8 +43,6 @@ var cameraYPosition = 150;
 var moving = false;
 var startMovement = false;
 var color = false;
-
-var particleGroup, particleAttributes;
 
 
 var intersects; //holds all face objects that the Raycaster intersects with
@@ -71,9 +64,7 @@ analyser.smoothingTimeConstant = 1;
 var dataArray;
 var boost = 0;
 var time = 0;
-var mp3_location = 'mp3/sample.mp3';
-
-var differenceArray = []; //used to calculate particle positions for each face; initialized in init() with initDifferenceArray()
+var mp3_location = 'mp3/sample0.mp3';
 
 init();
 animate();
@@ -106,12 +97,12 @@ function init()
 	stats.domElement.style.zIndex = 100;
 	container.appendChild( stats.domElement );
 
-	light = new THREE.DirectionalLight(0xffffff);
-	light.intensity = 10;
+	light = new THREE.PointLight(0xffffff);
+	light.intensity = 2;
 
-	back_light = new THREE.DirectionalLight(0xffffff); //add a little light behind camera to fake ambient effect
-	back_light.intensity = .25;
-	back_light.position.set(200,100,500);
+	back_light = new THREE.PointLight(0xffffff); //add a little light behind camera to fake ambient effect
+	back_light.intensity = .5;
+	back_light.position.set(0,100,500);
 	scene.add(back_light);
 
 	sun = new THREE.Mesh(
@@ -119,8 +110,8 @@ function init()
 	    new THREE.MeshBasicMaterial( { color: 0xffaa00 } )
 	);
 	sun_y = 100;
-  	sun.position.set(0,sun_y, -600);
- 	 scene.add(sun);
+  sun.position.set(0,sun_y, -600);
+ 	scene.add(sun);
 	light.position = sun.position; //these are the same
 	scene.add(light);
 
@@ -129,7 +120,6 @@ function init()
 	createFloor();
 	createFaces();
 	createGUI();
-	initDifferenceArray();
 
 	// when the mouse moves, call the given function
 	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
@@ -172,10 +162,6 @@ function play() {
     //play immediately
     src.start();
     playing = true;
-}
-
-function stop(){
-  src.stop();
 }
 
 function createSky(){
@@ -248,12 +234,11 @@ function updateFaces(zFacePosition){ //the first shall become the last
 
 function createGUI() {
 	var gui = new dat.GUI();
-	
-	var parameters = 
-	{
-		c: "" // start with empty String in text box
+	parameters = {
+		c: "", // start with empty String in text box
+		selector: "sample0",
+		custom: "",
 	};
-
 	gui.add( parameters, 'c' ).name('cheat codes').onChange(function(newValue)
 	{
 		//change faces to Steve faces
@@ -268,18 +253,30 @@ function createGUI() {
 			removeFaces(); //remove existing faces
 			createFaces(); //add new steve faces
 		}
-		//switch back to original Eli faces
+		//get a million points
 		if (newValue == "pointz") {
 			score += 1000000;
 			refreshScoreText();
 		}
+	});
+	gui.add( parameters, 'selector', [0,1,2,3]).name('select song').onChange(function(newValue)
+	{
+		mp3_location = "mp3/sample" + newValue + ".mp3";
+	});
+	gui.add( parameters, 'custom' ).name('custom track').onChange(function(newValue)
+	{
+		mp3_location = newValue;
 	});
 	gui.open();
 }
 
 function createFloor(){
 	var floorTexture = new THREE.ImageUtils.loadTexture( 'images/mars.jpg' );
-	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
+	var floorTextureBump = new THREE.ImageUtils.loadTexture( 'images/bump.jpg');
+	var floorMaterial = new THREE.MeshPhongMaterial( {
+		map: floorTexture,
+		bumpMap	: floorTextureBump,
+		bumpScale: 0.05,side: THREE.DoubleSide } );
 	var floorGeometry = new THREE.PlaneGeometry(5000, 5000);
     floor = new THREE.Mesh(floorGeometry, floorMaterial);
     //rotate 90 degrees around the xaxis so we can see the terrain
@@ -356,48 +353,18 @@ function refreshAnyText(str) {
 	createAnyText(str, false);
 }
 
-function addParticles() {
-	
-	var particles = new THREE.Geometry();
-	var coordinateArray = calculateParticlePoints();
-	var particleTexture = THREE.ImageUtils.loadTexture( 'images/spark.png' );
-
-	particleGroup = new THREE.Object3D();
-	particleAttributes = { startSize: [], startPosition: [], randomness: [] };
-
-	for (var p = 0; p < coordinateArray.length; p++) {
-
-		var spriteMaterial = new THREE.SpriteMaterial( { map: particleTexture, useScreenCoordinates: false, color: 0xffffff } );
-		
-		var sprite = new THREE.Sprite( spriteMaterial );
-		sprite.scale.set( 32, 32, 1.0 ); // imageWidth, imageHeight
-		sprite.position.set( coordinateArray[p].x, coordinateArray[p].y, coordinateArray[p].z);
-		sprite.material.blending = THREE.AdditiveBlending; // add glow to particles
-
-	    particleGroup.add( sprite );
-
-	    // add variable qualities to arrays, if they need to be accessed later
-		particleAttributes.startPosition.push( sprite.position.clone() );
-		particleAttributes.randomness.push( Math.random() );
-
-	}
-
-	particleGroup.position.x -= 30; //account for fact that origin of face is not in middle of face
-	scene.add( particleGroup );
-
-}
-
 function movement(){
 	cameraZPosition = cameraZPosition - 5;
 	camera.position.setZ(cameraZPosition);
 	textZ = cameraZPosition - 600; //to make sure refreshText still works
 	textMesh.position.setZ(textZ);
 	sun.position.setZ(cameraZPosition - 900);
+	skyBox.position.setZ(cameraZPosition - 500);
+	back_light.position.setZ(cameraZPosition + 100);
 	if (cameraZPosition % 150 == 0){
 		updateFaces(cameraZPosition - 950); //950 is 5 * -150 number of rows minus additional 200 as reference to camera position
 	}
-	if (cameraZPosition % 1000 == 0){
-		skyBox.position.setZ(cameraZPosition - 500);
+	if (cameraZPosition % 1200 == 0){
 		floor.position.setZ(cameraZPosition - 400);
 	}
 }
@@ -454,13 +421,17 @@ function onDocumentMouseDown( event )
 	LASER OBJECT DEFINITION
 
 	Custom constructor function used to create Laser objects
-	Inspired by: http://www.w3schools.com/js/js_object_prototypes.asp
+	Inspired by:
+		http://www.w3schools.com/js/js_object_prototypes.asp
+		http://javascriptissexy.com/oop-in-javascript-what-you-need-to-know/
 */
 function Laser(colorHex) {
 
 	//create instance properties; these properties will be unique to every instance of Laser created
 	this.laserColor = colorHex;
+	//this.laserGeometry = new THREE.CylinderGeometry( 1, 1, 50, 20, 4);
 	this.laserGeometry = new THREE.SphereGeometry( 3, 32, 16);
+
 	this.laserMaterial = new THREE.MeshPhongMaterial( { color: this.laserColor } );
 	this.laserMesh = new THREE.Mesh( this.laserGeometry, this.laserMaterial );
 	this.laserID = 0;
@@ -469,6 +440,7 @@ function Laser(colorHex) {
 	this.laserZLocation = cameraZPosition;
 	this.raycaster = null;
 	this.projector = new THREE.Projector();
+
 
 	/*
  	  Keeps track of how far along ray path a laser is;
@@ -556,43 +528,6 @@ function animate()
 function update()
 {
 
-	if (fadeToWhite == true) {
-		elapsed = clock.getElapsedTime();
-		if (elapsed > 1 && didExecute == false) {
-			secondsPassed = 1;
-			didExecute = true;
-		}
-		if ((elapsed - secondsPassed) >= 0.1) {
-			currOpacity = reduceFaceOpacity();
-			secondsPassed += 0.1;
-		}
-		if (currOpacity <= 0) {
-			fadeToWhite = false;
-			addParticles();
-			particlesOn = true;
-			removeFaces();
-			console.log("done");
-		}
-	}
-
-	if (particlesOn == true) {
-		var time = 4 * clock.getElapsedTime();
-		
-		for ( var c = 0; c < particleGroup.children.length; c ++ ) 
-		{
-			var sprite = particleGroup.children[ c ];
-			
-			// pulse away/towards center
-			// individual rates of movement
-			var a = particleAttributes.randomness[c] + 1;
-			var pulseFactor = Math.sin(a * time) * 0.01 + 0.9;
-			sprite.position.x = particleAttributes.startPosition[c].x * pulseFactor;
-			sprite.position.y = particleAttributes.startPosition[c].y * pulseFactor;
-			sprite.position.z = particleAttributes.startPosition[c].z * pulseFactor;	
-		}
-
-	}
-
 	//update coordinate position for all currently active lasers
 	for (var i = 0; i < activeLasers.length; i++) {
 		activeLasers[i].updateLaserLocation();
@@ -603,6 +538,7 @@ function update()
 				scene.remove(activeLasers[i].laserMesh);
 				activeLasers.splice(i, 1); //remove laser at index i from array
 				//intersects[0].object.scale.set(6,6,6);
+
 			}
 		}
 		else {
@@ -615,28 +551,40 @@ function update()
 
 	}
 
+	/* These are useful for testing but shouldn't work in the normal game
+	if ( keyboard.pressed("m") ){
+		moving = (! moving);
+	}
+	if ( keyboard.pressed("p") ){
+		loadFile();
+	}
+	if ( keyboard.pressed("s") ){
+		src.stop();
+	}
+	if ( keyboard.pressed("c") ){
+		color = (! color);
+	}
+	*/
+
 	if ( keyboard.pressed("up") ) //sun rises, max 1,000
 	{
+		sun_y +=5;
+		light.intensity = 1;
 		if (sun_y > 1000){
 			sun_y = 1000;
 		}
-		sun_y +=5;
-		light.intensity = 10;
 		sun.position.setY(sun_y);
 	}
 	if (keyboard.pressed("down")){ //sun lowers, min -15
 		sun_y -=5;
+		light.intensity = 1;
 		if (sun_y < -15){
 			sun_y = -15;
 			light.intensity = 0;
 		}
-		else{
-			light.intensity = 10;
-			sun.position.setY(sun_y);
-		}
+		sun.position.setY(sun_y);
 	}
 	if (showMessage == true) {
-
 		messageIsShowing = true;
 		if (myMesh != undefined) {
 			myMesh.position.setZ(textAnyZ); //update z position
@@ -653,6 +601,7 @@ function update()
 		if (messageIsShowing == true) {
 			scene.remove(myMesh);
 			messageIsShowing = false;
+			//textAnyZ = cameraZPosition - 600;
 			//this is to make sure movement does not start until "engines: engaged" message is off the screen, thus prevent lag
 			if (startMovement == true) {
 				startMovement = false; //we only want this to trigger once
@@ -681,11 +630,8 @@ function checkShowMessageText() {
 			startMovement = true;
 			break;
 		case 35:
-			moving = false;
-			message = "good night.";
+			message = "BOOM!";
 			showAndFade(message);
-			fadeToWhite = true;
-
 			break;
 		default:
 			break;
@@ -727,76 +673,6 @@ function randomColor() {
  			break;
  	}
 }
-
-/*
-	The locations of particles are calculated in relation to each face location
-	RETURNS: Array of Vector3 objects, which represent where particles should go for all faces
-*/
-function calculateParticlePoints() {
-	var particleLocations = [];
-	//for each face, calculate where particles should go
-	for (var a = 0; a < targetList.length; a++) {
-		for (var b = 0; b < differenceArray.length; b++) {
-			particleLocations.push( new THREE.Vector3(targetList[a].position.x + differenceArray[b].x, targetList[a].position.y + differenceArray[b].y, targetList[a].position.z + differenceArray[b].z) );
-		}
-	}
-	return particleLocations;
-}
-
-/*
-	Calculates where particle coordinates should go for a single face, using a reference face
-	to calculate relative particle locations for all other faces
-*/
-function initDifferenceArray() {
-	var particleArray = [];
-	var refOrigin = new THREE.Vector3(-100, 45, 200);
-
-	var refPoints = [
-		new THREE.Vector3(-87.67076939125482, 76.89012354256533, 232.82660309908994),
-		new THREE.Vector3(-86.3266780526229, 94.74379526191868, 234.26006335335987),
-		new THREE.Vector3(-82.20235973232512, 107.4134908654349, 228.90391314419006),
-		new THREE.Vector3(-71.15268230564126, 110.4832607792873, 218.02621849929423),
-		new THREE.Vector3(-67.43947424516968, 92.35801819178822, 207.74962039341438),
-		new THREE.Vector3(-66.02527188769162, 76.74006516191312, 213.60885036484947),
-		new THREE.Vector3(-66.57465125455278, 65.3068738420894, 221.4813231793779),
-		new THREE.Vector3(-78.79394769571655, 50.719308995964084, 209.59500301504272),
-		new THREE.Vector3(-85.54517589328219, 49.40603848992242, 219.70584184013515),
-		new THREE.Vector3(-69.6121281810403, 78.14526339432288, 232.80182763408692),
-		new THREE.Vector3(-72.78060272248622, 95.8912118190533, 224.94577582695547),
-		new THREE.Vector3(-71.74138818329281, 64.58371754020179, 230.85821255988736),
-		new THREE.Vector3(-77.02436916290922, 100.13491785845335, 232.8297354264714),
-		new THREE.Vector3(-75.72124106589814, 89.4803813534724, 229.96941042959764),
-		new THREE.Vector3( -68.2247894668391, 82.41223075617806, 217.88341480326721),
-		new THREE.Vector3( -66.76322539532832, 71.01479122132079, 219.682472682461),
-		new THREE.Vector3(-77.19374001742095, 71.66612123907646, 233.19283043673926),
-		new THREE.Vector3(-76.29991608852579, 64.2190222891632, 232.81366809822765),
-		new THREE.Vector3(-78.66828048110892, 87.51262439603208, 228.92403152697085),
-		new THREE.Vector3(-66.79699788648875, 76.78068974470881, 216.93153246858309),
-		new THREE.Vector3(-75.07897894420108, 86.36253587787778, 227.88281251200907),
-		new THREE.Vector3(-72.8675118734806, 66.32196526953577, 132.23925676792817),
-		new THREE.Vector3(-69.56829406950114, 79.55311270854696, 131.67329855063659),
-		new THREE.Vector3(-84.12689293301356, 106.58601280725743, 132.24187581472393),
-		new THREE.Vector3(-71.64162680175252, 60.812397329357005, 131.15496232167182),
-		new THREE.Vector3(-85.37968150608451, 50.9418272407617, 220.05573900330255),
-		new THREE.Vector3(-78.12833604518006, 51.05139290707531, 207.315803488046555)
-	];
-
-	for (var idx = 0; idx < refPoints.length; idx++) {
-		differenceArray.push( new THREE.Vector3(refPoints[idx].x - refOrigin.x, refPoints[idx].y - refOrigin.y, refPoints[idx].z - refOrigin.z) );
-	}
-
-}
-
-function reduceFaceOpacity() {
-	targetList[0].material.transparent = true;
-	targetList[1].material.transparent = true;
-	targetList[0].material.opacity -= 0.025;
-	targetList[1].material.opacity -= 0.025;
-	console.log("reduceface");
-	return targetList[0].material.opacity;
-
-}
-
 
 function render()
 {
