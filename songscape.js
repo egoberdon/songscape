@@ -364,7 +364,7 @@ function refreshAnyText(str) {
 }
 
 function addParticles() {
-	
+
 	var particles = new THREE.Geometry();
 	var coordinateArray = calculateParticlePoints();
 	var particleTexture = THREE.ImageUtils.loadTexture( 'images/spark.png' );
@@ -375,7 +375,7 @@ function addParticles() {
 	for (var p = 0; p < coordinateArray.length; p++) {
 
 		var spriteMaterial = new THREE.SpriteMaterial( { map: particleTexture, useScreenCoordinates: false, color: 0xffffff } );
-		
+
 		var sprite = new THREE.Sprite( spriteMaterial );
 		sprite.scale.set( 32, 32, 1.0 ); // imageWidth, imageHeight
 		sprite.position.set( coordinateArray[p].x, coordinateArray[p].y, coordinateArray[p].z);
@@ -561,6 +561,12 @@ function animate()
 	if (color){
 		faceColor();
 	}
+	src.onended = function() {
+		moving = false;
+		message = "good night.";
+		showAndFade(message);
+		fadeToWhite = true;
+	}
 	analyser.getByteTimeDomainData(dataArray); //grab the time domain data and copy it into our array
 	render();
 	update();
@@ -592,18 +598,18 @@ function update()
 
 	if (particlesOn == true) {
 		var time = 4 * clock.getElapsedTime();
-		
-		for ( var c = 0; c < particleGroup.children.length; c ++ ) 
+
+		for ( var c = 0; c < particleGroup.children.length; c ++ )
 		{
 			var sprite = particleGroup.children[ c ];
-			
+
 			// pulse away/towards center
 			// individual rates of movement
 			var a = particleAttributes.randomness[c] + 1;
 			var pulseFactor = Math.sin(a * time) * 0.01 + 0.9;
 			sprite.position.x = particleAttributes.startPosition[c].x * pulseFactor;
 			sprite.position.y = particleAttributes.startPosition[c].y * pulseFactor;
-			sprite.position.z = particleAttributes.startPosition[c].z * pulseFactor;	
+			sprite.position.z = particleAttributes.startPosition[c].z * pulseFactor;
 		}
 
 	}
