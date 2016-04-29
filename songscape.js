@@ -73,6 +73,7 @@ var dataArray;
 var boost = 0;
 var time = 0;
 var mp3_location = 'mp3/sample0.mp3';
+var playing = false;
 
 init();
 animate();
@@ -560,12 +561,6 @@ function animate()
 	}
 	if (color){
 		faceColor();
-	}
-	src.onended = function() {
-		moving = false;
-		message = "good night.";
-		showAndFade(message);
-		fadeToWhite = true;
 	}
 	analyser.getByteTimeDomainData(dataArray); //grab the time domain data and copy it into our array
 	render();
