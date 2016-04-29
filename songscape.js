@@ -699,17 +699,17 @@ function checkShowMessageText() {
 			showAndFade(message);
 			loadFile();
 			break;
-		case 15:
+		case 35:
 			message = "a world of color";
 			showAndFade(message);
 			color = true;
 			break;
-		case 25:
+		case 65:
 			message = "engines: engaged";
 			showAndFade(message);
 			startMovement = true;
 			break;
-		case 35:
+		case 100:
 			moving = false;
 			message = "good night.";
 			showAndFade(message);
