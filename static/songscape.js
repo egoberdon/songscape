@@ -10,8 +10,8 @@ var faceCall = 0;
 
 //face models
 var loader = new THREE.JSONLoader(); // init the loader util
-var face = eli = 'obj/finalFace.json'; //normal eli face
-var steve = 'obj/steve.json'; //alternate face for steve mode
+var face = eli = 'static/obj/finalFace.json'; //normal eli face
+var steve = 'static/obj/steve.json'; //alternate face for steve mode
 var steve_mode = false; //steve mode boolean flag
 
 //lighting
@@ -72,7 +72,7 @@ analyser.smoothingTimeConstant = 1;
 var dataArray;
 var boost = 0;
 var time = 0;
-var mp3_location = 'mp3/sample0.mp3';
+var mp3_location = 'static/mp3/sample0.mp3';
 var playing = false;
 
 init();
@@ -177,7 +177,7 @@ function play() {
 
 function createSky(){
 	//CODE FROM Stemkoski Skybox.html; TODO: customize with own sky images/textures
-	var imagePrefix = "images/space-";
+	var imagePrefix = "static/images/space-";
 	var directions  = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
 	var imageSuffix = ".jpg";
 	var skyGeometry = new THREE.CubeGeometry( 5000, 5000, 5000 );
@@ -272,7 +272,7 @@ function createGUI() {
 	});
 	gui.add( parameters, 'selector', [0,1,2,3]).name('select song').onChange(function(newValue)
 	{
-		mp3_location = "mp3/sample" + newValue + ".mp3";
+		mp3_location = "static/mp3/sample" + newValue + ".mp3";
 	});
 	gui.add( parameters, 'custom' ).name('custom track').onChange(function(newValue)
 	{
@@ -282,8 +282,8 @@ function createGUI() {
 }
 
 function createFloor(){
-	var floorTexture = new THREE.ImageUtils.loadTexture( 'images/mars.jpg' );
-	var floorTextureBump = new THREE.ImageUtils.loadTexture( 'images/bump.jpg');
+	var floorTexture = new THREE.ImageUtils.loadTexture( 'static/images/mars.jpg' );
+	var floorTextureBump = new THREE.ImageUtils.loadTexture( 'static/images/bump.jpg');
 	var floorMaterial = new THREE.MeshPhongMaterial( {
 		map: floorTexture,
 		bumpMap	: floorTextureBump,
@@ -368,7 +368,7 @@ function addParticles() {
 
 	var particles = new THREE.Geometry();
 	var coordinateArray = calculateParticlePoints();
-	var particleTexture = THREE.ImageUtils.loadTexture( 'images/spark.png' );
+	var particleTexture = THREE.ImageUtils.loadTexture( 'static/images/spark.png' );
 
 	particleGroup = new THREE.Object3D();
 	particleAttributes = { startSize: [], startPosition: [], randomness: [] };
@@ -821,7 +821,6 @@ function reduceFaceOpacity() {
 	targetList[1].material.transparent = true;
 	targetList[0].material.opacity -= 0.025;
 	targetList[1].material.opacity -= 0.025;
-	console.log("reduceface");
 	return targetList[0].material.opacity;
 
 }
