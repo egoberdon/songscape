@@ -17,7 +17,7 @@ $ pip install Flask
 $ export FLASK_APP=app
 $ flask run
 ```
-
+Now songscape will be running at http://127.0.0.1:5000
 ##Runtime Environment
 
 Tested on Chrome
