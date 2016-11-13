@@ -8,8 +8,8 @@ Load up songscape.html in a browser to start the fun!
 Gain points with different point values to unlock different parts of the experience.
 
 ##Requirements
--Python
--Pip
++ Python
++ Pip
 
 ##Entering the songscape
 ```bash
